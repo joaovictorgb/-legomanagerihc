@@ -1,0 +1,2667 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LEGO Manager</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+        }
+        /* Toast Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeOut {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(-20px); }
+        }
+        .animate-fadeIn {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        .animate-fadeOut {
+            animation: fadeOut 0.5s ease-in forwards;
+        }
+        
+        /* Responsividade para dispositivos móveis */
+        @media (max-width: 640px) {
+            .container {
+                padding-left: 12px;
+                padding-right: 12px;
+            }
+            
+            h1.text-3xl {
+                font-size: 1.5rem;
+            }
+            
+            h2.text-2xl {
+                font-size: 1.25rem;
+            }
+            
+            .py-8 {
+                padding-top: 1.5rem;
+                padding-bottom: 1.5rem;
+            }
+            
+            .py-6 {
+                padding-top: 1rem;
+                padding-bottom: 1rem;
+            }
+            
+            /* Ajustes para tabelas em dispositivos móveis */
+            .overflow-x-auto {
+                -webkit-overflow-scrolling: touch;
+            }
+        }
+        
+        /* Ajustes específicos para tablets */
+        @media (min-width: 641px) and (max-width: 1024px) {
+            /* Estilos específicos para tablets */
+            .grid.grid-cols-1.md\:grid-cols-2 {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed top-0 right-0 p-6 space-y-2 z-50 w-full max-w-sm">
+        <!-- Toasts will be appended here -->
+    </div>
+
+    <!-- Tela inicial -->
+    <div id="tela-inicial" class="block">
+        <div class="bg-red-600 shadow-lg">
+            <div class="container mx-auto px-4 py-6">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/LEGO_logo.svg/512px-LEGO_logo.svg.png" alt="LEGO Logo" class="h-16 mx-auto">
+            </div>
+        </div>
+        
+        <div class="container mx-auto px-4 py-8">
+            <div class="max-w-lg mx-auto bg-white rounded-lg shadow-md overflow-hidden">
+                <div class="px-6 py-8">
+                    <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Bem-vindo ao LEGO Manager</h1>
+                    <p class="text-gray-600 text-center mb-8">Gerencie sua coleção de peças e sets LEGO com facilidade</p>
+                    
+                    <div class="flex flex-col space-y-4">
+                        <button onclick="mostrarTela('tela-login')" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300">
+                            Entrar com conta existente
+                        </button>
+                        <button onclick="mostrarTela('tela-cadastro')" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-3 px-4 rounded-lg transition duration-300">
+                            Criar nova conta
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tela de Login -->
+    <div id="tela-login" class="hidden">
+        <div class="bg-red-600 shadow-lg">
+            <div class="container mx-auto px-4 py-4 flex items-center">
+                <button onclick="mostrarTela('tela-inicial')" class="text-white mr-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                    </svg>
+                </button>
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/LEGO_logo.svg/512px-LEGO_logo.svg.png" alt="LEGO Logo" class="h-10">
+            </div>
+        </div>
+        
+        <div class="container mx-auto px-4 py-8">
+            <div class="max-w-md mx-auto bg-white rounded-lg shadow-md overflow-hidden">
+                <div class="px-6 py-8">
+                    <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Fazer Login</h2>
+                    
+                    <form class="space-y-4">
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-gray-700 mb-1">E-mail</label>
+                            <input type="email" id="email" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500" placeholder="seu@email.com" required>
+                        </div>
+                        
+                        <div>
+                            <label for="senha" class="block text-sm font-medium text-gray-700 mb-1">Senha</label>
+                            <input type="password" id="senha" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500" placeholder="Sua senha" required>
+                        </div>
+                        
+                        <div class="text-right">
+                            <a href="#" onclick="mostrarTela('tela-recuperar-senha')" class="text-sm text-red-600 hover:underline">Esqueceu sua senha?</a>
+                        </div>
+                        
+                        <button type="button" onclick="mostrarTela('tela-funcionalidades')" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-md transition duration-300">
+                            Entrar
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tela de Cadastro -->
+    <div id="tela-cadastro" class="hidden">
+        <div class="bg-red-600 shadow-lg">
+            <div class="container mx-auto px-4 py-4 flex items-center">
+                <button onclick="mostrarTela('tela-inicial')" class="text-white mr-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                    </svg>
+                </button>
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/LEGO_logo.svg/512px-LEGO_logo.svg.png" alt="LEGO Logo" class="h-10">
+            </div>
+        </div>
+        
+        <div class="container mx-auto px-4 py-8">
+            <div class="max-w-md mx-auto bg-white rounded-lg shadow-md overflow-hidden">
+                <div class="px-6 py-8">
+                    <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Criar Conta</h2>
+                    
+                    <form class="space-y-4">
+                        <div>
+                            <label for="nome" class="block text-sm font-medium text-gray-700 mb-1">Nome completo</label>
+                            <input type="text" id="nome" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500" placeholder="Seu nome completo" required>
+                        </div>
+                        
+                        <div>
+                            <label for="email-cadastro" class="block text-sm font-medium text-gray-700 mb-1">E-mail</label>
+                            <input type="email" id="email-cadastro" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500" placeholder="seu@email.com" required>
+                        </div>
+                        
+                        <div>
+                            <label for="senha-cadastro" class="block text-sm font-medium text-gray-700 mb-1">Senha</label>
+                            <input type="password" id="senha-cadastro" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500" placeholder="Crie uma senha" required>
+                        </div>
+                        
+                        <div>
+                            <label for="confirmar-senha" class="block text-sm font-medium text-gray-700 mb-1">Confirmar senha</label>
+                            <input type="password" id="confirmar-senha" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500" placeholder="Confirme sua senha" required>
+                        </div>
+                        
+                        <button type="button" onclick="mostrarTela('tela-funcionalidades')" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-md transition duration-300">
+                            Criar conta
+                        </button>
+                        
+                        <div class="text-center">
+                            <button type="button" onclick="mostrarTela('tela-inicial')" class="text-sm text-gray-600 hover:underline">
+                                Cancelar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tela de Recuperar Senha -->
+    <div id="tela-recuperar-senha" class="hidden">
+        <div class="bg-red-600 shadow-lg">
+            <div class="container mx-auto px-4 py-4 flex items-center">
+                <button onclick="mostrarTela('tela-login')" class="text-white mr-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                    </svg>
+                </button>
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/LEGO_logo.svg/512px-LEGO_logo.svg.png" alt="LEGO Logo" class="h-10">
+            </div>
+        </div>
+        
+        <div class="container mx-auto px-4 py-8">
+            <div class="max-w-md mx-auto bg-white rounded-lg shadow-md overflow-hidden">
+                <div class="px-6 py-8">
+                    <h2 class="text-2xl font-bold text-center text-gray-800 mb-2">Recuperar Senha</h2>
+                    <p class="text-gray-600 text-center mb-6">Enviaremos um código para o seu e-mail</p>
+                    
+                    <form class="space-y-4">
+                        <div>
+                            <label for="email-recuperacao" class="block text-sm font-medium text-gray-700 mb-1">E-mail</label>
+                            <input type="email" id="email-recuperacao" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500" placeholder="seu@email.com" required>
+                        </div>
+                        
+                        <div id="codigo-recuperacao" class="hidden">
+                            <label for="codigo" class="block text-sm font-medium text-gray-700 mb-1">Código de recuperação</label>
+                            <input type="text" id="codigo" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500" placeholder="Código de 6 dígitos" required>
+                        </div>
+                        
+                        <div id="nova-senha" class="hidden">
+                            <div class="mb-4">
+                                <label for="nova-senha-input" class="block text-sm font-medium text-gray-700 mb-1">Nova senha</label>
+                                <input type="password" id="nova-senha-input" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500" placeholder="Nova senha" required>
+                            </div>
+                            
+                            <div>
+                                <label for="confirmar-nova-senha" class="block text-sm font-medium text-gray-700 mb-1">Confirmar nova senha</label>
+                                <input type="password" id="confirmar-nova-senha" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500" placeholder="Confirme a nova senha" required>
+                            </div>
+                        </div>
+                        
+                        <button type="button" id="btn-recuperar" onclick="solicitarCodigo()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-md transition duration-300">
+                            Enviar código
+                        </button>
+                        
+                        <div class="text-center">
+                            <button type="button" onclick="mostrarTela('tela-login')" class="text-sm text-gray-600 hover:underline">
+                                Cancelar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tela de Funcionalidades -->
+    <div id="tela-funcionalidades" class="hidden">
+        <div class="bg-red-600 shadow-lg">
+            <div class="container mx-auto px-4 py-4 flex items-center justify-between">
+                <div class="flex items-center">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/LEGO_logo.svg/512px-LEGO_logo.svg.png" alt="LEGO Logo" class="h-10">
+                    <h2 class="text-white font-bold ml-4">LEGO Manager</h2>
+                </div>
+                <div class="flex items-center">
+                    <span class="text-white mr-3">Usuário</span>
+                    <button onclick="sairDaConta()" class="flex items-center text-white bg-red-700 hover:bg-red-800 px-3 py-1 rounded">
+                        <span class="mr-1">Sair</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="container mx-auto px-4 py-8">
+            <h1 class="text-2xl font-bold text-gray-800 mb-6">Bem-vindo, Usuário!</h1>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition duration-300 cursor-pointer" onclick="mostrarTela('tela-cadastrar-peca')">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-blue-500 rounded-full p-3 mr-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-white">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-semibold">Cadastrar Peça</h3>
+                    </div>
+                    <p class="text-gray-600">Adicione novas peças LEGO à sua coleção</p>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition duration-300 cursor-pointer" onclick="mostrarTela('tela-gerenciar-peca')">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-green-500 rounded-full p-3 mr-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-white">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-semibold">Gerenciar Peças</h3>
+                    </div>
+                    <p class="text-gray-600">Edite, atualize ou marque peças como quebradas</p>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition duration-300 cursor-pointer" onclick="mostrarTela('tela-cadastrar-set')">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-yellow-500 rounded-full p-3 mr-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-white">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-semibold">Cadastrar Set</h3>
+                    </div>
+                    <p class="text-gray-600">Adicione novos sets LEGO à sua coleção</p>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition duration-300 cursor-pointer" onclick="mostrarTela('tela-montar-set')">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-red-500 rounded-full p-3 mr-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-white">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M21 7.5l-2.25-1.313M21 7.5v2.25m0-2.25l-2.25 1.313M3 7.5l2.25-1.313M3 7.5l2.25 1.313M3 7.5v2.25m9 3l2.25-1.313M12 12.75l-2.25-1.313M12 12.75V15m0 6.75l2.25-1.313M12 21.75V19.5m0 2.25l-2.25-1.313m0-16.875L12 2.25l2.25 1.313M21 14.25v2.25l-2.25 1.313m-13.5 0L3 16.5v-2.25" />
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-semibold">Montar Set</h3>
+                    </div>
+                    <p class="text-gray-600">Acompanhe a montagem de sets e verifique peças disponíveis</p>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition duration-300 cursor-pointer" onclick="mostrarTela('tela-explorar-sets')">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-purple-500 rounded-full p-3 mr-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-white">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607zM13.5 10.5h-6" />
+                            </svg>
+            </div>
+                        <h3 class="text-lg font-semibold">Explorar Sets para Montar</h3>
+                    </div>
+                    <p class="text-gray-600">Busque um set e veja se você tem as peças</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tela de Cadastrar Peça -->
+    <div id="tela-cadastrar-peca" class="hidden">
+        <div class="bg-red-600 shadow-lg">
+            <div class="container mx-auto px-4 py-4 flex items-center">
+                <button onclick="mostrarTela('tela-funcionalidades')" class="text-white mr-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                    </svg>
+                </button>
+                <h2 class="text-white text-xl font-bold">Cadastrar Peça</h2>
+            </div>
+        </div>
+        
+        <div class="container mx-auto px-4 py-8">
+            <div class="max-w-md mx-auto bg-white rounded-lg shadow-md overflow-hidden">
+                <div class="px-6 py-8">
+                    <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Como deseja cadastrar?</h2>
+                    
+                    <div class="flex flex-col space-y-4">
+                        <button onclick="mostrarTela('tela-cadastrar-peca-nome')" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg transition duration-300">
+                            Cadastrar por Nome
+                        </button>
+                        <button onclick="mostrarTela('tela-cadastrar-peca-id')" class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg transition duration-300">
+                            Cadastrar por ID
+                        </button>
+                        <button onclick="mostrarTela('tela-funcionalidades')" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-3 px-4 rounded-lg transition duration-300">
+                            Cancelar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tela de Cadastrar Peça por Nome -->
+    <div id="tela-cadastrar-peca-nome" class="hidden">
+        <div class="bg-red-600 shadow-lg">
+            <div class="container mx-auto px-4 py-4 flex items-center">
+                <button onclick="mostrarTela('tela-cadastrar-peca')" class="text-white mr-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                    </svg>
+                </button>
+                <h2 class="text-white text-xl font-bold">Cadastrar por Nome</h2>
+            </div>
+        </div>
+        
+        <div class="container mx-auto px-4 py-8">
+            <div class="max-w-md mx-auto bg-white rounded-lg shadow-md overflow-hidden">
+                <div class="px-6 py-8">
+                    <form class="space-y-4">
+                        <div>
+                            <label for="nome-peca" class="block text-sm font-medium text-gray-700 mb-1">Nome da Peça</label>
+                            <input type="text" id="nome-peca" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ex: Brick 2x4" required>
+                        </div>
+                        
+                        <div>
+                            <label for="cor-peca" class="block text-sm font-medium text-gray-700 mb-1">Cor</label>
+                            <select id="cor-peca" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">Selecione a cor</option>
+                                <option value="vermelho">Vermelho</option>
+                                <option value="azul">Azul</option>
+                                <option value="amarelo">Amarelo</option>
+                                <option value="verde">Verde</option>
+                                <option value="preto">Preto</option>
+                                <option value="branco">Branco</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label for="set-peca" class="block text-sm font-medium text-gray-700 mb-1">Set</label>
+                            <input type="text" id="set-peca" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Nome ou código do set (opcional)">
+                        </div>
+                        
+                        <button type="button" onclick="buscarPecas()" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-md transition duration-300">
+                            Buscar Peças
+                        </button>
+                    </form>
+                    
+                    <!-- Resultados da busca - inicialmente oculto -->
+                    <div id="resultados-busca" class="hidden mt-6">
+                        <h3 class="text-lg font-semibold mb-3">Peças encontradas:</h3>
+                        
+                        <div class="space-y-3">
+                            <div class="border border-gray-200 rounded-md p-3 hover:bg-gray-50 cursor-pointer">
+                                <div class="flex justify-between">
+                                    <div>
+                                        <h4 class="font-medium">Brick 2x4</h4>
+                                        <p class="text-sm text-gray-600">ID: 3001</p>
+                                    </div>
+                                    <img src="https://www.bricklink.com/PL/3001.jpg" alt="Brick 2x4" class="h-10">
+                                </div>
+                            </div>
+                            
+                            <div class="border border-gray-200 rounded-md p-3 hover:bg-gray-50 cursor-pointer">
+                                <div class="flex justify-between">
+                                    <div>
+                                        <h4 class="font-medium">Brick 2x4 Modified</h4>
+                                        <p class="text-sm text-gray-600">ID: 30414</p>
+                                    </div>
+                                    <img src="https://www.bricklink.com/PL/30414.jpg" alt="Brick 2x4 Modified" class="h-10">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6 space-y-4">
+                            <div>
+                                <label for="peca-selecionada" class="block text-sm font-medium text-gray-700 mb-1">Peça Selecionada</label>
+                                <input type="text" id="peca-selecionada" class="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-100" value="Brick 2x4 (ID: 3001)" readonly>
+                            </div>
+                            
+                            <div>
+                                <label for="quantidade-peca" class="block text-sm font-medium text-gray-700 mb-1">Quantidade</label>
+                                <input type="number" id="quantidade-peca" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" value="1" min="1">
+                            </div>
+                            
+                            <button type="button" onclick="confirmarNovaPeca()" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-md transition duration-300">
+                                Adicionar Peça
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tela de Cadastrar Peça por ID -->
+    <div id="tela-cadastrar-peca-id" class="hidden">
+        <div class="bg-red-600 shadow-lg">
+            <div class="container mx-auto px-4 py-4 flex items-center">
+                <button onclick="mostrarTela('tela-cadastrar-peca')" class="text-white mr-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                    </svg>
+                </button>
+                <h2 class="text-white text-xl font-bold">Cadastrar por ID</h2>
+            </div>
+        </div>
+        
+        <div class="container mx-auto px-4 py-8">
+            <div class="max-w-md mx-auto bg-white rounded-lg shadow-md overflow-hidden">
+                <div class="px-6 py-8">
+                    <form class="space-y-4">
+                        <div>
+                            <label for="id-peca" class="block text-sm font-medium text-gray-700 mb-1">ID da Peça</label>
+                            <input type="text" id="id-peca" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ex: 3001" required>
+                        </div>
+                        
+                        <div>
+                            <label for="cor-peca-id" class="block text-sm font-medium text-gray-700 mb-1">Cor</label>
+                            <select id="cor-peca-id" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">Selecione a cor</option>
+                                <option value="vermelho">Vermelho</option>
+                                <option value="azul">Azul</option>
+                                <option value="amarelo">Amarelo</option>
+                                <option value="verde">Verde</option>
+                                <option value="preto">Preto</option>
+                                <option value="branco">Branco</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label for="set-peca-id" class="block text-sm font-medium text-gray-700 mb-1">Set</label>
+                            <input type="text" id="set-peca-id" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Nome ou código do set (opcional)">
+                        </div>
+                        
+                        <button type="button" onclick="buscarPecasPorId()" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-md transition duration-300">
+                            Buscar Peças
+                        </button>
+                    </form>
+                    
+                    <!-- Resultados da busca - inicialmente oculto -->
+                    <div id="resultados-busca-id" class="hidden mt-6">
+                        <h3 class="text-lg font-semibold mb-3">Peça encontrada:</h3>
+                        
+                        <div class="border border-gray-200 rounded-md p-3">
+                            <div class="flex justify-between">
+                                <div>
+                                    <h4 class="font-medium">Brick 2x4</h4>
+                                    <p class="text-sm text-gray-600">ID: 3001</p>
+                                </div>
+                                <img src="https://www.bricklink.com/PL/3001.jpg" alt="Brick 2x4" class="h-10">
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6 space-y-4">
+                            <div>
+                                <label for="quantidade-peca-id" class="block text-sm font-medium text-gray-700 mb-1">Quantidade</label>
+                                <input type="number" id="quantidade-peca-id" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" value="1" min="1">
+                            </div>
+                            
+                            <button type="button" onclick="confirmarNovaPecaPorId()" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-md transition duration-300">
+                                Adicionar Peça
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tela de Gerenciar Peças -->
+    <div id="tela-gerenciar-peca" class="hidden">
+        <div class="bg-red-600 shadow-lg">
+            <div class="container mx-auto px-4 py-4 flex items-center">
+                <button onclick="mostrarTela('tela-funcionalidades')" class="text-white mr-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                    </svg>
+                </button>
+                <h2 class="text-white text-xl font-bold">Gerenciar Peças</h2>
+            </div>
+        </div>
+        
+        <div class="container mx-auto px-4 py-8">
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <div class="p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold text-gray-800">Inventário de Peças</h2>
+                        <div>
+                            <button onclick="mostrarTela('tela-gerenciar-quebradas')" class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-md mr-2">
+                                Peças Quebradas
+                            </button>
+                            <button onclick="mostrarTela('tela-funcionalidades')" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-md">
+                                Voltar
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <input type="text" placeholder="Buscar peças..." class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                    </div>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full bg-white border border-gray-200">
+                            <thead>
+                                <tr>
+                                    <th class="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Imagem
+                                    </th>
+                                    <th class="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Nome
+                                    </th>
+                                    <th class="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        ID
+                                    </th>
+                                    <th class="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Cor
+                                    </th>
+                                    <th class="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Quantidade
+                                    </th>
+                                    <th class="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Ações
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <img src="https://www.bricklink.com/PL/3001.jpg" alt="Brick 2x4" class="h-10">
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm font-medium text-gray-900">Brick 2x4</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-500">3001</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-500">Vermelho</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-500">24</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                        <button onclick="mostrarTela('tela-editar-peca')" class="text-green-600 hover:text-green-900 mr-3">Editar</button>
+                                        <button onclick="marcarQuebrada(1)" class="text-red-600 hover:text-red-900">Quebrada</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <img src="https://www.bricklink.com/PL/3003.jpg" alt="Brick 2x2" class="h-10">
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm font-medium text-gray-900">Brick 2x2</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-500">3003</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-500">Azul</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-500">36</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                        <button onclick="mostrarTela('tela-editar-peca')" class="text-green-600 hover:text-green-900 mr-3">Editar</button>
+                                        <button onclick="marcarQuebrada(2)" class="text-red-600 hover:text-red-900">Quebrada</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <img src="https://www.bricklink.com/PL/3005.jpg" alt="Brick 1x1" class="h-10">
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm font-medium text-gray-900">Brick 1x1</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-500">3005</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-500">Amarelo</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-500">48</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                        <button onclick="mostrarTela('tela-editar-peca')" class="text-green-600 hover:text-green-900 mr-3">Editar</button>
+                                        <button onclick="marcarQuebrada(3)" class="text-red-600 hover:text-red-900">Quebrada</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tela de Editar Peça -->
+    <div id="tela-editar-peca" class="hidden">
+        <div class="bg-red-600 shadow-lg">
+            <div class="container mx-auto px-4 py-4 flex items-center">
+                <button onclick="mostrarTela('tela-gerenciar-peca')" class="text-white mr-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                    </svg>
+                </button>
+                <h2 class="text-white text-xl font-bold">Editar Peça</h2>
+            </div>
+        </div>
+        
+        <div class="container mx-auto px-4 py-8">
+            <div class="max-w-md mx-auto bg-white rounded-lg shadow-md overflow-hidden">
+                <div class="px-6 py-8">
+                    <div class="flex items-center justify-center mb-6">
+                        <img src="https://www.bricklink.com/PL/3001.jpg" alt="Brick 2x4" class="h-20">
+                    </div>
+                    
+                    <form class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nome da Peça</label>
+                            <input type="text" class="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-100" value="Brick 2x4" readonly>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">ID</label>
+                            <input type="text" class="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-100" value="3001" readonly>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Cor</label>
+                            <input type="text" class="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-100" value="Vermelho" readonly>
+                        </div>
+                        
+                        <div>
+                            <label for="quantidade-editar" class="block text-sm font-medium text-gray-700 mb-1">Quantidade</label>
+                            <input type="number" id="quantidade-editar" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" value="24" min="0">
+                        </div>
+                        
+                        <button type="button" onclick="salvarEdicaoPeca()" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-md transition duration-300">
+                            Salvar Alterações
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tela de Gerenciar Peças Quebradas -->
+    <div id="tela-gerenciar-quebradas" class="hidden">
+        <div class="bg-red-600 shadow-lg">
+            <div class="container mx-auto px-4 py-4 flex items-center">
+                <button onclick="mostrarTela('tela-gerenciar-peca')" class="text-white mr-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                    </svg>
+                </button>
+                <h2 class="text-white text-xl font-bold">Peças Quebradas</h2>
+            </div>
+        </div>
+        
+        <div class="container mx-auto px-4 py-8">
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <div class="p-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Peças Quebradas/Danificadas</h2>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full bg-white border border-gray-200">
+                            <thead>
+                                <tr>
+                                    <th class="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Imagem
+                                    </th>
+                                    <th class="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Nome
+                                    </th>
+                                    <th class="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        ID
+                                    </th>
+                                    <th class="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Cor
+                                    </th>
+                                    <th class="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Quantidade
+                                    </th>
+                                    <th class="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Ações
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabela-quebradas" class="divide-y divide-gray-200">
+                                <!-- Peças quebradas serão adicionadas aqui dinamicamente -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div id="sem-quebradas" class="text-center py-8">
+                        <p class="text-gray-500">Não há peças quebradas registradas.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tela de Cadastrar Set -->
+    <div id="tela-cadastrar-set" class="hidden">
+        <div class="bg-red-600 shadow-lg">
+            <div class="container mx-auto px-4 py-4 flex items-center">
+                <button onclick="mostrarTela('tela-funcionalidades')" class="text-white mr-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                    </svg>
+                </button>
+                <h2 class="text-white text-xl font-bold">Cadastrar Set</h2>
+            </div>
+        </div>
+        
+        <div class="container mx-auto px-4 py-8">
+            <div class="max-w-md mx-auto bg-white rounded-lg shadow-md overflow-hidden">
+                <div class="px-6 py-8">
+                    <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Estado do Set</h2>
+                    
+                    <div class="flex flex-col space-y-4">
+                        <button onclick="mostrarTela('tela-cadastrar-set-completo')" class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg transition duration-300">
+                            Set Completo
+                        </button>
+                        <button onclick="mostrarTela('tela-cadastrar-set-incompleto')" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-3 px-4 rounded-lg transition duration-300">
+                            Set Incompleto
+                        </button>
+                        <button onclick="mostrarTela('tela-cadastrar-set-origem')" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg transition duration-300">
+                            Registrar Origem
+                        </button>
+                        <button onclick="mostrarTela('tela-funcionalidades')" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-3 px-4 rounded-lg transition duration-300">
+                            Cancelar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tela de Cadastrar Set - Origem -->
+    <div id="tela-cadastrar-set-origem" class="hidden">
+        <div class="bg-red-600 shadow-lg">
+            <div class="container mx-auto px-4 py-4 flex items-center">
+                <button onclick="mostrarTela('tela-cadastrar-set')" class="text-white mr-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                    </svg>
+                </button>
+                <h2 class="text-white text-xl font-bold">Registrar Origem</h2>
+            </div>
+        </div>
+        
+        <div class="container mx-auto px-4 py-8">
+            <div class="max-w-md mx-auto bg-white rounded-lg shadow-md overflow-hidden">
+                <div class="px-6 py-8">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Origem do Set</h2>
+                    
+                    <form class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-3">Selecione a Origem</label>
+                            <div class="space-y-2">
+                                <div class="flex items-center">
+                                    <input type="radio" id="origem-presente" name="origem" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                                    <label for="origem-presente" class="ml-2 block text-sm text-gray-700">Presente</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="radio" id="origem-ml" name="origem" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                                    <label for="origem-ml" class="ml-2 block text-sm text-gray-700">Mercado Livre</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="radio" id="origem-ebay" name="origem" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                                    <label for="origem-ebay" class="ml-2 block text-sm text-gray-700">eBay</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="radio" id="origem-outros" name="origem" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                                    <label for="origem-outros" class="ml-2 block text-sm text-gray-700">Outros</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label for="data-aquisicao" class="block text-sm font-medium text-gray-700 mb-1">Data de Aquisição</label>
+                            <input type="date" id="data-aquisicao" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        
+                        <div>
+                            <label for="preco" class="block text-sm font-medium text-gray-700 mb-1">Preço (opcional)</label>
+                            <input type="number" id="preco" step="0.01" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="R$ 0,00">
+                        </div>
+                        
+                        <button type="button" onclick="mostrarTela('tela-integrar-sites')" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-md transition duration-300">
+                            Confirmar
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tela de Integrar com Sites Externos -->
+    <div id="tela-integrar-sites" class="hidden">
+        <div class="bg-red-600 shadow-lg">
+            <div class="container mx-auto px-4 py-4 flex items-center">
+                <button onclick="mostrarTela('tela-cadastrar-set-origem')" class="text-white mr-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                    </svg>
+                </button>
+                <h2 class="text-white text-xl font-bold">Integração</h2>
+            </div>
+        </div>
+        
+        <div class="container mx-auto px-4 py-8">
+            <div class="max-w-md mx-auto bg-white rounded-lg shadow-md overflow-hidden">
+                <div class="px-6 py-8">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Integrar com Sites Externos</h2>
+                    
+                    <form class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-3">Selecione o Site</label>
+                            <div class="space-y-2">
+                                <div class="flex items-center">
+                                    <input type="radio" id="site-brickset" name="site" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                                    <label for="site-brickset" class="ml-2 block text-sm text-gray-700">Brickset</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="radio" id="site-rebrickable" name="site" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                                    <label for="site-rebrickable" class="ml-2 block text-sm text-gray-700">Rebrickable</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="radio" id="site-bricklink" name="site" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                                    <label for="site-bricklink" class="ml-2 block text-sm text-gray-700">Bricklink</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="radio" id="site-lego" name="site" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                                    <label for="site-lego" class="ml-2 block text-sm text-gray-700">LEGO Oficial</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label for="set-id" class="block text-sm font-medium text-gray-700 mb-1">ID do Set (opcional)</label>
+                            <input type="text" id="set-id" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ex: 10283">
+                        </div>
+                        
+                        <button type="button" onclick="simularImportacao()" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-md transition duration-300">
+                            Buscar Informações
+                        </button>
+                        
+                        <!-- Resultado da importação - inicialmente oculto -->
+                        <div id="resultado-importacao" class="hidden mt-4 p-4 bg-gray-50 rounded-md border border-gray-200">
+                            <h3 class="font-medium text-gray-900 mb-2">Set Encontrado:</h3>
+                            <div class="flex items-center mb-4">
+                                <img src="https://www.lego.com/cdn/cs/set/assets/blt3baed7e0eb07ab31/10283.jpg?fit=bounds&format=jpg&quality=80&width=320&height=320&dpr=1" alt="NASA Space Shuttle Discovery" class="h-16 mr-4">
+                                <div>
+                                    <p class="font-medium">NASA Space Shuttle Discovery</p>
+                                    <p class="text-sm text-gray-600">ID: 10283</p>
+                                </div>
+                            </div>
+                            <p class="text-sm text-gray-600 mb-2">Peças: 2354</p>
+                            <p class="text-sm text-gray-600 mb-4">Ano: 2021</p>
+                            
+                            <button type="button" onclick="confirmarImportacao()" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-md transition duration-300">
+                                Importar Dados
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tela de Montar Set -->
+    <div id="tela-montar-set" class="hidden">
+        <div class="bg-red-600 shadow-lg">
+            <div class="container mx-auto px-4 py-4 flex items-center">
+                <button onclick="mostrarTela('tela-funcionalidades')" class="text-white mr-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                    </svg>
+                </button>
+                <h2 class="text-white text-xl font-bold">Montar Set</h2>
+            </div>
+        </div>
+        
+        <div class="container mx-auto px-4 py-8">
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <div class="p-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Meus Sets</h2>
+                    
+                    <div class="mb-4">
+                        <input type="text" placeholder="Buscar sets..." class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition duration-300 cursor-pointer" onclick="mostrarTela('tela-verificar-pecas')">
+                            <div class="flex mb-3">
+                                <img src="https://www.lego.com/cdn/cs/set/assets/blt3baed7e0eb07ab31/10283.jpg?fit=bounds&format=jpg&quality=80&width=320&height=320&dpr=1" alt="NASA Space Shuttle Discovery" class="h-20 mr-4">
+                                <div>
+                                    <h3 class="font-medium text-lg">NASA Space Shuttle Discovery</h3>
+                                    <p class="text-sm text-gray-600">ID: 10283</p>
+                                    <p class="text-sm text-gray-600">Peças: 2354</p>
+                                    <p class="text-sm text-gray-600">Completo: <span class="text-green-600">Sim</span></p>
+                                </div>
+                            </div>
+                            <div class="flex justify-end">
+                                <button class="bg-red-500 hover:bg-red-600 text-white text-sm px-3 py-1 rounded">Montar</button>
+                            </div>
+                        </div>
+                        
+                        <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition duration-300 cursor-pointer" onclick="mostrarTela('tela-verificar-pecas')">
+                            <div class="flex mb-3">
+                                <img src="https://www.lego.com/cdn/cs/set/assets/blt0d234a31bb467a42/75192.jpg" alt="Millennium Falcon" class="h-20 mr-4">
+                                <div>
+                                    <h3 class="font-medium text-lg">Millennium Falcon</h3>
+                                    <p class="text-sm text-gray-600">ID: 75192</p>
+                                    <p class="text-sm text-gray-600">Peças: 7541</p>
+                                    <p class="text-sm text-gray-600">Completo: <span class="text-yellow-600">Parcial</span></p>
+                                </div>
+                            </div>
+                            <div class="flex justify-end">
+                                <button class="bg-red-500 hover:bg-red-600 text-white text-sm px-3 py-1 rounded">Montar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tela de Verificar Peças Faltantes -->
+    <div id="tela-verificar-pecas" class="hidden">
+        <div class="bg-red-600 shadow-lg">
+            <div class="container mx-auto px-4 py-4 flex items-center">
+                <button onclick="voltarDaTelaVerificarPecas()" class="text-white mr-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                    </svg>
+                </button>
+                <h2 class="text-white text-xl font-bold">Verificar Peças</h2>
+            </div>
+        </div>
+        
+        <div class="container mx-auto px-4 py-8">
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <div class="p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 id="nome-set-verificar" class="text-2xl font-bold text-gray-800">[Nome do Set]</h2>
+                        <div class="flex items-center">
+                            <label class="mr-3 text-sm font-medium text-gray-700">Verificar peças:</label>
+                            <div class="flex items-center mr-4">
+                                <input type="radio" id="verificar-com-cores" name="verificar" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300" checked>
+                                <label for="verificar-com-cores" class="ml-2 block text-sm text-gray-700">Com cores</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="radio" id="verificar-sem-cores" name="verificar" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                                <label for="verificar-sem-cores" class="ml-2 block text-sm text-gray-700">Sem cores</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
+                        <h3 class="font-medium text-yellow-800 mb-2">Peças necessárias para este set (simulação):</h3>
+                        <div id="lista-pecas-necessarias" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                            <!-- Peças faltantes/necessárias serão populadas aqui -->
+                        </div>
+                    </div>
+                    
+                    <div class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-md">
+                        <h3 class="font-medium text-blue-800 mb-2">Peças disponíveis em seus outros sets (simulação):</h3>
+                        <div id="lista-pecas-disponiveis-outros-sets" class="text-sm">
+                            <!-- Sugestões de onde encontrar peças serão populadas aqui -->
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-between">
+                        <button onclick="voltarDaTelaVerificarPecas()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-md transition duration-300">
+                            Voltar
+                        </button>
+                        <button id="btn-iniciar-montagem" onclick="mostrarTela('tela-modo-montagem')" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-md transition duration-300">
+                            Continuar Mesmo Assim
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tela de Cadastrar Set Completo -->
+    <div id="tela-cadastrar-set-completo" class="hidden">
+        <div class="bg-red-600 shadow-lg">
+            <div class="container mx-auto px-4 py-4 flex items-center">
+                <button onclick="mostrarTela('tela-cadastrar-set')" class="text-white mr-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                    </svg>
+                </button>
+                <h2 class="text-white text-xl font-bold">Set Completo</h2>
+            </div>
+        </div>
+        
+        <div class="container mx-auto px-4 py-8">
+            <div class="max-w-md mx-auto bg-white rounded-lg shadow-md overflow-hidden">
+                <div class="px-6 py-8">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Cadastrar Set Completo</h2>
+                    
+                    <form class="space-y-4">
+                        <div>
+                            <label for="nome-set" class="block text-sm font-medium text-gray-700 mb-1">Nome do Set</label>
+                            <input type="text" id="nome-set" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="Ex: NASA Space Shuttle Discovery" required>
+                        </div>
+                        
+                        <div>
+                            <label for="codigo-set" class="block text-sm font-medium text-gray-700 mb-1">Código do Set (opcional)</label>
+                            <input type="text" id="codigo-set" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="Ex: 10283">
+                        </div>
+                        
+                        <button type="button" onclick="buscarSets()" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-md transition duration-300">
+                            Buscar Set
+                        </button>
+                        
+                        <!-- Resultados da busca - inicialmente oculto -->
+                        <div id="resultados-busca-set" class="hidden mt-6">
+                            <h3 class="text-lg font-semibold mb-3">Sets encontrados:</h3>
+                            
+                            <div class="space-y-3">
+                                <div class="border border-gray-200 rounded-md p-3 hover:bg-gray-50 cursor-pointer">
+                                    <div class="flex justify-between">
+                                        <div>
+                                            <h4 class="font-medium">NASA Space Shuttle Discovery</h4>
+                                            <p class="text-sm text-gray-600">Código: 10283</p>
+                                            <p class="text-sm text-gray-600">Peças: 2354</p>
+                                        </div>
+                                        <img src="https://www.lego.com/cdn/cs/set/assets/blt3baed7e0eb07ab31/10283.jpg?fit=bounds&format=jpg&quality=80&width=320&height=320&dpr=1" alt="NASA Space Shuttle Discovery" class="h-16">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-6 space-y-4">
+                                <div>
+                                    <label for="set-selecionado" class="block text-sm font-medium text-gray-700 mb-1">Set Selecionado</label>
+                                    <input type="text" id="set-selecionado" class="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-100" value="NASA Space Shuttle Discovery (10283)" readonly>
+                                </div>
+                                
+                                <button type="button" onclick="confirmarSetCompleto()" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-md transition duration-300">
+                                    Adicionar Set Completo
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tela de Cadastrar Set Incompleto -->
+    <div id="tela-cadastrar-set-incompleto" class="hidden">
+        <div class="bg-red-600 shadow-lg">
+            <div class="container mx-auto px-4 py-4 flex items-center">
+                <button onclick="mostrarTela('tela-cadastrar-set')" class="text-white mr-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                    </svg>
+                </button>
+                <h2 class="text-white text-xl font-bold">Set Incompleto</h2>
+            </div>
+        </div>
+        
+        <div class="container mx-auto px-4 py-8">
+            <div class="max-w-md mx-auto bg-white rounded-lg shadow-md overflow-hidden">
+                <div class="px-6 py-8">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Cadastrar Set Incompleto</h2>
+                    
+                    <form class="space-y-4">
+                        <div>
+                            <label for="nome-set-inc" class="block text-sm font-medium text-gray-700 mb-1">Nome do Set</label>
+                            <input type="text" id="nome-set-inc" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500" placeholder="Ex: Millennium Falcon" required>
+                        </div>
+                        
+                        <div>
+                            <label for="codigo-set-inc" class="block text-sm font-medium text-gray-700 mb-1">Código do Set (opcional)</label>
+                            <input type="text" id="codigo-set-inc" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500" placeholder="Ex: 75192">
+                        </div>
+                        
+                        <button type="button" onclick="buscarSetsIncompletos()" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-md transition duration-300">
+                            Buscar Set
+                        </button>
+                        
+                        <!-- Resultados da busca - inicialmente oculto -->
+                        <div id="resultados-busca-set-inc" class="hidden mt-6">
+                            <h3 class="text-lg font-semibold mb-3">Set encontrado:</h3>
+                            
+                            <div class="border border-gray-200 rounded-md p-3">
+                                <div class="flex justify-between">
+                                    <div>
+                                        <h4 class="font-medium">Millennium Falcon</h4>
+                                        <p class="text-sm text-gray-600">Código: 75192</p>
+                                        <p class="text-sm text-gray-600">Peças: 7541</p>
+                                    </div>
+                                    <img src="https://www.lego.com/cdn/cs/set/assets/blt0d234a31bb467a42/75192.jpg" alt="Millennium Falcon" class="h-16">
+                                </div>
+                            </div>
+                            
+                            <div class="mt-6">
+                                <h3 class="text-lg font-semibold mb-3">Lista de Peças:</h3>
+                                
+                                <div class="mb-4 max-h-60 overflow-y-auto border border-gray-200 rounded-md p-3">
+                                    <div class="space-y-2">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center">
+                                                <img src="https://www.bricklink.com/PL/3001.jpg" alt="Brick 2x4" class="h-8 mr-2">
+                                                <div>
+                                                    <p class="text-sm font-medium">Brick 2x4</p>
+                                                    <p class="text-xs text-gray-600">Cinza</p>
+                                                </div>
+                                            </div>
+                                            <div class="flex items-center">
+                                                <span class="text-sm mr-2">45 unidades</span>
+                                                <button class="text-red-500 hover:text-red-700">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 00-3.7-3.7 48.678 48.678 0 00-7.324 0 4.006 4.006 0 00-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3l-3-3m-12 3c0 1.232.046 2.453.138 3.662a4.006 4.006 0 003.7 3.7 48.656 48.656 0 007.324 0 4.006 4.006 0 003.7-3.7c.017-.22.032-.441.046-.662M4.5 12l3 3m-3-3l-3 3" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center">
+                                                <img src="https://www.bricklink.com/PL/3003.jpg" alt="Brick 2x2" class="h-8 mr-2">
+                                                <div>
+                                                    <p class="text-sm font-medium">Brick 2x2</p>
+                                                    <p class="text-xs text-gray-600">Branco</p>
+                                                </div>
+                                            </div>
+                                            <div class="flex items-center">
+                                                <span class="text-sm mr-2">32 unidades</span>
+                                                <button class="text-red-500 hover:text-red-700">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 00-3.7-3.7 48.678 48.678 0 00-7.324 0 4.006 4.006 0 00-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3l-3-3m-12 3c0 1.232.046 2.453.138 3.662a4.006 4.006 0 003.7 3.7 48.656 48.656 0 007.324 0 4.006 4.006 0 003.7-3.7c.017-.22.032-.441.046-.662M4.5 12l3 3m-3-3l-3 3" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center">
+                                                <img src="https://www.bricklink.com/PL/3622.jpg" alt="Brick 1x3" class="h-8 mr-2">
+                                                <div>
+                                                    <p class="text-sm font-medium">Brick 1x3</p>
+                                                    <p class="text-xs text-gray-600">Preto</p>
+                                                </div>
+                                            </div>
+                                            <div class="flex items-center">
+                                                <span class="text-sm mr-2">18 unidades</span>
+                                                <button class="text-red-500 hover:text-red-700">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 00-3.7-3.7 48.678 48.678 0 00-7.324 0 4.006 4.006 0 00-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3l-3-3m-12 3c0 1.232.046 2.453.138 3.662a4.006 4.006 0 003.7 3.7 48.656 48.656 0 007.324 0 4.006 4.006 0 003.7-3.7c.017-.22.032-.441.046-.662M4.5 12l3 3m-3-3l-3 3" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <p class="text-sm text-yellow-600 mb-4">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 inline-block mr-1">
+                                        <path fill-rule="evenodd" d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003zM12 8.25a.75.75 0 01.75.75v3.75a.75.75 0 01-1.5 0V9a.75.75 0 01.75-.75zm0 8.25a.75.75 0 100-1.5.75.75 0 000 1.5z" clip-rule="evenodd" />
+                                    </svg>
+                                    Desmarque as peças que estão faltando clicando no ícone à direita de cada peça.
+                                </p>
+                                
+                                <button type="button" onclick="confirmarSetIncompleto()" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-md transition duration-300">
+                                    Adicionar Set Incompleto
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tela de Modo de Montagem -->
+    <div id="tela-modo-montagem" class="hidden">
+        <div class="bg-red-600 shadow-lg">
+            <div class="container mx-auto px-4 py-4 flex items-center">
+                <button onclick="mostrarTela('tela-verificar-pecas')" class="text-white mr-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                    </svg>
+                </button>
+                <h2 class="text-white text-xl font-bold">Modo de Montagem</h2>
+            </div>
+        </div>
+        
+        <div class="container mx-auto px-4 py-8">
+            <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-md overflow-hidden">
+                <div class="px-6 py-8">
+                    <h2 class="text-2xl font-bold text-center text-gray-800 mb-6" id="nome-set-montagem">NASA Space Shuttle Discovery</h2>
+                    
+                    <div class="mb-6">
+                        <h3 class="text-lg font-semibold mb-3">Tipo de Set:</h3>
+                        <div class="space-y-2">
+                            <div class="flex items-center">
+                                <input type="radio" id="tipo-system" name="tipo-set" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300" checked>
+                                <label for="tipo-system" class="ml-2 block text-sm text-gray-700">LEGO SYSTEM/CITY</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="radio" id="tipo-technic" name="tipo-set" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                                <label for="tipo-technic" class="ml-2 block text-sm text-gray-700">LEGO TECHNIC</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="radio" id="tipo-mindstorms" name="tipo-set" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300" onchange="toggleMindstormsSubOptions(this.checked)">
+                                <label for="tipo-mindstorms" class="ml-2 block text-sm text-gray-700">MINDSTORMS</label>
+                            </div>
+                            <div id="mindstorms-sub-options" class="hidden ml-6 space-y-2 mt-2">
+                                <div class="flex items-center">
+                                    <input type="radio" id="mindstorms-2-0" name="mindstorms-subtype" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                                    <label for="mindstorms-2-0" class="ml-2 block text-sm text-gray-700">MINDSTORMS 2.0</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="radio" id="mindstorms-ev3" name="mindstorms-subtype" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                                    <label for="mindstorms-ev3" class="ml-2 block text-sm text-gray-700">MINDSTORMS EV3</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Visualização das Instruções -->
+                    <div class="mb-6">
+                        <h3 class="text-lg font-semibold mb-3">Instruções de Montagem:</h3>
+                        <div class="border border-gray-200 rounded-lg p-4">
+                            <div class="flex flex-col md:flex-row">
+                                <!-- Navegação de Passos -->
+                                <div class="w-full md:w-1/4 mb-4 md:mb-0 md:pr-4">
+                                    <div class="bg-gray-100 rounded-lg p-3">
+                                        <h4 class="font-medium text-gray-700 mb-2">Passos</h4>
+                                        <div class="space-y-2 max-h-40 md:max-h-80 overflow-y-auto">
+                                            <div class="bg-blue-500 text-white rounded px-3 py-2 cursor-pointer" onclick="mostrarPasso(1)">
+                                                Passo 1
+                                            </div>
+                                            <div class="bg-gray-200 hover:bg-gray-300 rounded px-3 py-2 cursor-pointer" onclick="mostrarPasso(2)">
+                                                Passo 2
+                                            </div>
+                                            <div class="bg-gray-200 hover:bg-gray-300 rounded px-3 py-2 cursor-pointer" onclick="mostrarPasso(3)">
+                                                Passo 3
+                                            </div>
+                                            <div class="bg-gray-200 hover:bg-gray-300 rounded px-3 py-2 cursor-pointer" onclick="mostrarPasso(4)">
+                                                Passo 4
+                                            </div>
+                                            <div class="bg-gray-200 hover:bg-gray-300 rounded px-3 py-2 cursor-pointer" onclick="mostrarPasso(5)">
+                                                Passo 5
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Visualização do Passo Atual -->
+                                <div class="w-full md:w-3/4">
+                                    <div class="bg-gray-100 rounded-lg p-3 h-full">
+                                        <div class="flex justify-between items-center mb-3">
+                                            <button class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-3 py-1 rounded" onclick="passoAnterior()">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                                                </svg>
+                                            </button>
+                                            <h4 class="font-medium text-gray-700" id="titulo-passo-atual">Passo 1 de 5</h4>
+                                            <button class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-3 py-1 rounded" onclick="proximoPasso()">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                        
+                                        <div class="flex justify-center items-center bg-white rounded-lg p-2 mb-3 min-h-[300px]">
+                                            <img id="imagem-passo-atual" src="https://www.lego.com/cdn/product-assets/product.bi.core.pdf/6217457.pdf.png" alt="Passo 1" class="max-h-[280px] max-w-full">
+                                        </div>
+                                        
+                                        <div class="flex justify-between">
+                                            <div>
+                                                <h5 class="font-medium text-sm text-gray-700 mb-1">Peças necessárias:</h5>
+                                                <div class="flex space-x-2" id="pecas-passo-atual">
+                                                    <div class="bg-white rounded p-1">
+                                                        <img src="https://www.bricklink.com/PL/3001.jpg" alt="Brick 2x4" class="h-8">
+                                                        <p class="text-xs text-center">x2</p>
+                                                    </div>
+                                                    <div class="bg-white rounded p-1">
+                                                        <img src="https://www.bricklink.com/PL/3003.jpg" alt="Brick 2x2" class="h-8">
+                                                        <p class="text-xs text-center">x4</p>
+                                                    </div>
+                                                    <div class="bg-white rounded p-1">
+                                                        <img src="https://www.bricklink.com/PL/3023.jpg" alt="Plate 1x2" class="h-8">
+                                                        <p class="text-xs text-center">x6</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <button class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded self-end" onclick="marcarPassoConcluido()">
+                                                Concluído
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="button" onclick="iniciarMontagem()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300 mb-4">
+                        Iniciar Montagem
+                    </button>
+                    
+                    <div class="flex justify-center">
+                        <button type="button" onclick="mostrarTela('tela-verificar-pecas')" class="text-gray-600 hover:text-gray-800">
+                            Voltar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tela de Gerenciar Set Montado -->
+    <div id="tela-gerenciar-set-montado" class="hidden">
+        <div class="bg-red-600 shadow-lg">
+            <div class="container mx-auto px-4 py-4 flex items-center">
+                <button onclick="mostrarTela('tela-modo-montagem')" class="text-white mr-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                    </svg>
+                </button>
+                <h2 class="text-white text-xl font-bold">Gerenciar Set Montado</h2>
+            </div>
+        </div>
+        
+        <div class="container mx-auto px-4 py-8">
+            <div class="max-w-md mx-auto bg-white rounded-lg shadow-md overflow-hidden">
+                <div class="px-6 py-8">
+                    <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Set: [Nome do Set Atualmente Montado]</h2> 
+                    <p class="text-gray-600 text-center mb-8">O que você gostaria de fazer?</p>
+                    
+                    <div class="flex flex-col space-y-4">
+                        <button onclick="acaoSetMontado('desmontar')" class="bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-4 rounded-lg transition duration-300">
+                            Desmontar Set
+                        </button>
+                        <button onclick="acaoSetMontado('guardar')" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg transition duration-300">
+                            Guardar Set Montado
+                        </button>
+                        <button onclick="acaoSetMontado('modificacoes')" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-3 px-4 rounded-lg transition duration-300">
+                            Registrar Modificações
+                        </button>
+                        <button onclick="acaoSetMontado('compartilhar')" class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg transition duration-300">
+                            Compartilhar Modelo
+                        </button>
+                        <button onclick="mostrarTela('tela-funcionalidades')" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-3 px-4 rounded-lg transition duration-300">
+                            Voltar para Funcionalidades
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tela de Explorar Sets para Montar -->
+    <div id="tela-explorar-sets" class="hidden">
+        <div class="bg-red-600 shadow-lg">
+            <div class="container mx-auto px-4 py-4 flex items-center">
+                <button onclick="mostrarTela('tela-funcionalidades')" class="text-white mr-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                    </svg>
+                </button>
+                <h2 class="text-white text-xl font-bold">Explorar Sets para Montar</h2>
+            </div>
+        </div>
+        
+        <div class="container mx-auto px-4 py-8">
+            <div class="max-w-lg mx-auto bg-white rounded-lg shadow-md overflow-hidden">
+                <div class="px-6 py-8">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Encontre um Set</h2>
+                    <div class="mb-4">
+                        <input type="text" id="busca-set-externo" placeholder="Digite nome ou ID do set..." class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+                    </div>
+                    <button type="button" onclick="buscarSetExterno()" class="w-full bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded-md transition duration-300 mb-6">
+                        Buscar
+                    </button>
+
+                    <!-- Resultados da busca - inicialmente oculto -->
+                    <div id="resultados-busca-set-externo" class="hidden">
+                        <h3 class="text-lg font-semibold mb-3">Resultados da Busca:</h3>
+                        <div class="space-y-3" id="lista-resultados-set-externo">
+                            <!-- Os resultados da busca serão inseridos aqui pelo JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script para navegação entre telas -->
+    <script>
+        // Variável global para armazenar o set atualmente em contexto (seja de "Meus Sets" ou "Explorar")
+        let setAtualEmContexto = null;
+        let toastTimeout = null;
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `p-4 rounded-md shadow-lg text-white flex justify-between items-center animate-fadeIn mb-2`;
+            
+            // Define a cor de fundo com base no tipo
+            let bgColor = 'bg-green-500'; // Success
+            let icon = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>`;
+            
+            if (type === 'error') {
+                bgColor = 'bg-red-500';
+                icon = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>`;
+            } else if (type === 'info') {
+                bgColor = 'bg-blue-500';
+                icon = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>`;
+            } else if (type === 'warning') {
+                bgColor = 'bg-yellow-500';
+                icon = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>`;
+            }
+
+            toast.classList.add(bgColor);
+
+            toast.innerHTML = `
+                <div class="flex items-center">
+                    ${icon}
+                    <span>${message}</span>
+                </div>
+                <button onclick="this.parentElement.remove()" class="ml-4 text-xl font-semibold hover:text-gray-200">&times;</button>
+            `;
+            
+            container.appendChild(toast);
+
+            // Clear existing timeout if a new toast is shown quickly
+            if (toastTimeout) {
+                clearTimeout(toastTimeout);
+            }
+
+            // Auto-remove toast after a delay
+            toastTimeout = setTimeout(() => {
+                toast.classList.add('animate-fadeOut');
+                setTimeout(() => {
+                    if (toast.parentElement) { // Check if still in DOM
+                        toast.remove();
+                    }
+                }, 500); // Match fadeOut animation duration
+            }, 3000); // Toast visible for 3 seconds
+        }
+
+        function mostrarTela(idTela) {
+            // Esconde todas as telas
+            document.querySelectorAll('div[id^="tela-"]').forEach(tela => {
+                tela.classList.add('hidden');
+                tela.classList.remove('block');
+            });
+            
+            // Mostra a tela solicitada
+            const telaParaMostrar = document.getElementById(idTela);
+            if (telaParaMostrar) {
+                telaParaMostrar.classList.remove('hidden');
+                telaParaMostrar.classList.add('block');
+            }
+
+            // Limpar campo de busca e resultados ao sair da tela de explorar sets
+            if (idTela !== 'tela-explorar-sets') {
+                const inputBusca = document.getElementById('busca-set-externo');
+                if (inputBusca) inputBusca.value = '';
+                const resultadosBusca = document.getElementById('resultados-busca-set-externo');
+                if (resultadosBusca) resultadosBusca.classList.add('hidden');
+                const listaResultados = document.getElementById('lista-resultados-set-externo');
+                if (listaResultados) listaResultados.innerHTML = '';
+            }
+
+            // Garante que sub-opções de Mindstorms estejam ocultas ao trocar de tela, a menos que seja a tela de modo de montagem
+            if (idTela !== 'tela-modo-montagem') {
+                const mindstormsSubOptions = document.getElementById('mindstorms-sub-options');
+                if (mindstormsSubOptions) {
+                    mindstormsSubOptions.classList.add('hidden');
+                }
+                 // Desmarcar radios de tipo de set para resetar estado
+                const tipoSetRadios = document.querySelectorAll('input[name="tipo-set"]');
+                tipoSetRadios.forEach(radio => {
+                    if(radio.id !== 'tipo-mindstorms'){ // não desmarcar o próprio mindstorms se ele estiver selecionado
+                        radio.checked = false;
+                    }
+                });
+            } else {
+                // Se estiver mostrando a tela-modo-montagem, verificar se Mindstorms está selecionado para mostrar sub-opções
+                const mindstormsRadio = document.getElementById('tipo-mindstorms');
+                if (mindstormsRadio && mindstormsRadio.checked) {
+                     toggleMindstormsSubOptions(true);
+                } else {
+                     toggleMindstormsSubOptions(false);
+                }
+            }
+
+            if (idTela === 'tela-montar-set') {
+                const containerMeusSets = document.querySelector("#tela-montar-set .grid");
+                if (containerMeusSets) {
+                    containerMeusSets.innerHTML = '<p id="loading-meus-sets" class="text-center text-gray-500 col-span-full">Carregando seus sets...</p>'; // Indicador de carregamento
+                    
+                    // Simular um pequeno delay para o carregamento
+                    setTimeout(() => {
+                        document.getElementById("loading-meus-sets")?.remove(); // Remover o indicador
+                        if (meusSetsCadastrados.length === 0) {
+                            containerMeusSets.innerHTML = '<p class="text-center text-gray-500 col-span-full">Você ainda não cadastrou nenhum set.</p>';
+                        } else {
+                            containerMeusSets.innerHTML = ''; // Limpa para adicionar os cards
+                            meusSetsCadastrados.forEach(set => {
+                                const setCard = `
+                                <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition duration-300 cursor-pointer" onclick="selecionarMeuSetParaMontagem('${set.id}')">
+                                    <div class="flex mb-3">
+                                        <img src="${set.imagem || 'https://via.placeholder.com/80x80.png?text=Set'}" alt="${set.nome}" class="h-20 mr-4 object-contain">
+                                        <div>
+                                            <h3 class="font-medium text-lg">${set.nome}</h3>
+                                            <p class="text-sm text-gray-600">ID: ${set.id}</p>
+                                            <p class="text-sm text-gray-600">Peças: ${set.listaPecas ? set.listaPecas.reduce((acc, p) => acc + p.quantidade, 0) : 'N/A'}</p>
+                                            <p class="text-sm text-gray-600">Completo: <span class="text-green-600">Sim</span></p>  <!-- Simulação --> 
+                                        </div>
+                                    </div>
+                                    <div class="flex justify-end">
+                                        <button class="bg-red-500 hover:bg-red-600 text-white text-sm px-3 py-1 rounded">Montar</button>
+                                    </div>
+                                </div>
+                                `;
+                                containerMeusSets.innerHTML += setCard;
+                            });
+                        }
+                    }, 500); // Delay de 0.5 segundos
+                }
+            }
+        }
+
+        // Função para selecionar um set para montagem
+        function selecionarMeuSetParaMontagem(setId) {
+            // Encontra o set pelo ID
+            const set = meusSetsCadastrados.find(s => s.id === setId);
+            if (!set) {
+                showToast('Set não encontrado', 'error');
+                return;
+            }
+            
+            // Adiciona imagem simulada para o exemplo
+            set.imagem = set.id === "10297" 
+                ? "https://www.lego.com/cdn/cs/set/assets/blt6c6acff6d2b0e8e0/10297.png" 
+                : "https://www.lego.com/cdn/cs/set/assets/blt5c0e805bf6c2e535/42083.jpg";
+                
+            // Adiciona a contagem total de peças
+            set.pecasTotal = set.listaPecas.reduce((acc, p) => acc + p.quantidade, 0);
+            
+            // Guarda o set selecionado no contexto global
+            setAtualEmContexto = { ...set, origem: 'interno' };
+            
+            // Prepara a tela de verificação de peças
+            prepararTelaVerificarPecas(setAtualEmContexto);
+            
+            // Mostra a tela de verificação
+            mostrarTela('tela-verificar-pecas');
+        }
+
+        function toggleMindstormsSubOptions(show) {
+            const subOptions = document.getElementById('mindstorms-sub-options');
+            if (!subOptions) return; // Adicionado para segurança
+
+            const mindstormsRadio = document.getElementById('tipo-mindstorms');
+
+            if (show && mindstormsRadio && mindstormsRadio.checked) {
+                subOptions.classList.remove('hidden');
+            } else {
+                subOptions.classList.add('hidden');
+                if (! (mindstormsRadio && mindstormsRadio.checked) ) { // Apenas desmarcar subtipos se Mindstorms não estiver selecionado
+                    document.querySelectorAll('input[name="mindstorms-subtype"]').forEach(radio => radio.checked = false);
+                }
+            }
+        }
+        
+        // Adicionar event listeners para os outros radio buttons de tipo de set
+        // para esconder as sub-opções de Mindstorms quando outro tipo for selecionado.
+        document.addEventListener('DOMContentLoaded', () => {
+            const tipoSetRadios = document.querySelectorAll('input[name="tipo-set"]');
+            tipoSetRadios.forEach(radio => {
+                radio.addEventListener('change', () => {
+                    if (radio.id !== 'tipo-mindstorms') {
+                        document.getElementById('mindstorms-sub-options').classList.add('hidden');
+                        document.querySelectorAll('input[name="mindstorms-subtype"]').forEach(subRadio => subRadio.checked = false);
+                    } else {
+                        // Se Mindstorms for explicitamente selecionado, mostrar sub-opções
+                         toggleMindstormsSubOptions(radio.checked);
+                    }
+                });
+            });
+
+            // Adicionar event listener para o botão de iniciar montagem
+            document.getElementById('btn-iniciar-montagem')?.addEventListener('click', iniciarMontagem);
+
+            // Inicializar os radios de verificação de cores
+            document.getElementById('verificar-com-cores').checked = true;
+            document.getElementById('verificar-sem-cores').checked = false;
+        });
+
+        function solicitarCodigo() {
+            const email = document.getElementById('email-recuperacao').value;
+            if (!email) {
+                showToast('Por favor, insira seu e-mail', 'error');
+                return;
+            }
+            showToast('Código de recuperação enviado (simulado)!', 'info');
+            
+            // Em um caso real, aqui enviaríamos o código para o e-mail
+            // Para o protótipo, vamos simular o recebimento do código
+            
+            // Mostra o campo de código
+            document.getElementById('codigo-recuperacao').classList.remove('hidden');
+            
+            // Altera o botão para verificar o código
+            const btnRecuperar = document.getElementById('btn-recuperar');
+            btnRecuperar.textContent = 'Verificar código';
+            btnRecuperar.onclick = verificarCodigo;
+        }
+        
+        function verificarCodigo() {
+            const codigo = document.getElementById('codigo').value;
+            if (!codigo) {
+                showToast('Por favor, insira o código recebido', 'error');
+                return;
+            }
+            showToast('Código verificado (simulado)!', 'info');
+            
+            // Em um caso real, verificaríamos se o código está correto
+            // Para o protótipo, vamos assumir que o código está correto
+            
+            // Mostra os campos de nova senha
+            document.getElementById('nova-senha').classList.remove('hidden');
+            
+            // Altera o botão para redefinir a senha
+            const btnRecuperar = document.getElementById('btn-recuperar');
+            btnRecuperar.textContent = 'Redefinir senha';
+            btnRecuperar.onclick = redefinirSenha;
+        }
+        
+        function redefinirSenha() {
+            const novaSenha = document.getElementById('nova-senha-input').value;
+            const confirmarSenha = document.getElementById('confirmar-nova-senha').value;
+            
+            if (!novaSenha || !confirmarSenha) {
+                showToast('Por favor, preencha todos os campos', 'error');
+                return;
+            }
+            
+            if (novaSenha !== confirmarSenha) {
+                showToast('As senhas não correspondem', 'error');
+                return;
+            }
+            
+            showToast('Senha redefinida com sucesso!');
+            mostrarTela('tela-login');
+        }
+
+        function buscarPecas() {
+            const resultadosDiv = document.getElementById('resultados-busca');
+            resultadosDiv.innerHTML = '<p class="text-center text-gray-500">Buscando peças...</p>';
+            resultadosDiv.classList.remove('hidden');
+
+            setTimeout(() => {
+                // Simula a resposta da busca
+                 resultadosDiv.innerHTML = `
+                    <h3 class="text-lg font-semibold mb-3">Peças encontradas:</h3>
+                    <div class="space-y-3">
+                        <div class="border border-gray-200 rounded-md p-3 hover:bg-gray-50 cursor-pointer" onclick="preencherPecaSelecionada('Brick 2x4', '3001')">
+                            <div class="flex justify-between">
+                                <div>
+                                    <h4 class="font-medium">Brick 2x4</h4>
+                                    <p class="text-sm text-gray-600">ID: 3001</p>
+                                </div>
+                                <img src="https://www.bricklink.com/PL/3001.jpg" alt="Brick 2x4" class="h-10">
+                            </div>
+                        </div>
+                        <div class="border border-gray-200 rounded-md p-3 hover:bg-gray-50 cursor-pointer" onclick="preencherPecaSelecionada('Brick 2x4 Modified', '30414')">
+                            <div class="flex justify-between">
+                                <div>
+                                    <h4 class="font-medium">Brick 2x4 Modified</h4>
+                                    <p class="text-sm text-gray-600">ID: 30414</p>
+                                </div>
+                                <img src="https://www.bricklink.com/PL/30414.jpg" alt="Brick 2x4 Modified" class="h-10">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-6 space-y-4">
+                        <div>
+                            <label for="peca-selecionada" class="block text-sm font-medium text-gray-700 mb-1">Peça Selecionada</label>
+                            <input type="text" id="peca-selecionada" class="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-100" value="" readonly>
+                        </div>
+                        <div>
+                            <label for="quantidade-peca" class="block text-sm font-medium text-gray-700 mb-1">Quantidade</label>
+                            <input type="number" id="quantidade-peca" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" value="1" min="1">
+                        </div>
+                        <button type="button" onclick="confirmarNovaPeca()" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-md transition duration-300">
+                            Adicionar Peça
+                        </button>
+                    </div>
+                `;
+            }, 700); // Simula delay
+        }
+
+        function preencherPecaSelecionada(nome, id){
+            document.getElementById('peca-selecionada').value = `${nome} (ID: ${id})`;
+        }
+        
+        function confirmarNovaPeca() {
+            const pecaSelecionada = document.getElementById('peca-selecionada').value;
+            if (!pecaSelecionada) {
+                showToast('Por favor, selecione uma peça da busca.', 'error');
+                return;
+            }
+            showToast('Peça adicionada com sucesso!');
+            mostrarTela('tela-funcionalidades');
+        }
+        
+        function buscarPecasPorId() {
+            const resultadosDiv = document.getElementById('resultados-busca-id');
+            resultadosDiv.innerHTML = '<p class="text-center text-gray-500">Buscando peça...</p>';
+            resultadosDiv.classList.remove('hidden');
+            
+            setTimeout(() => {
+                // Simula a resposta da busca por ID
+                resultadosDiv.innerHTML = `
+                    <h3 class="text-lg font-semibold mb-3">Peça encontrada:</h3>
+                    <div class="border border-gray-200 rounded-md p-3">
+                        <div class="flex justify-between">
+                            <div>
+                                <h4 class="font-medium">Brick 2x4</h4>
+                                <p class="text-sm text-gray-600">ID: 3001 (Exemplo)</p>
+                            </div>
+                            <img src="https://www.bricklink.com/PL/3001.jpg" alt="Brick 2x4" class="h-10">
+                        </div>
+                    </div>
+                    <div class="mt-6 space-y-4">
+                        <div>
+                            <label for="quantidade-peca-id" class="block text-sm font-medium text-gray-700 mb-1">Quantidade</label>
+                            <input type="number" id="quantidade-peca-id" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" value="1" min="1">
+                        </div>
+                        <button type="button" onclick="confirmarNovaPecaPorId()" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-md transition duration-300">
+                            Adicionar Peça
+                        </button>
+                    </div>
+                `;
+            }, 700);
+        }
+        
+        function confirmarNovaPecaPorId() {
+            showToast('Peça adicionada com sucesso!');
+            mostrarTela('tela-funcionalidades');
+        }
+
+        function salvarEdicaoPeca() {
+            showToast('Quantidade atualizada com sucesso!');
+            mostrarTela('tela-gerenciar-peca');
+        }
+        
+        // Array para armazenar peças quebradas
+        const pecasQuebradas = [];
+        
+        function marcarQuebrada(id) {
+            // Simulação de dados
+            let peca;
+            if (id === 1) { // Assumindo que o ID aqui é um índice ou identificador único da linha da tabela
+                // Em um sistema real, você pegaria os dados da linha da tabela clicada
+                peca = {
+                    imagem: document.querySelectorAll("#tela-gerenciar-peca tbody tr")[0].cells[0].querySelector('img').src,
+                    nome: document.querySelectorAll("#tela-gerenciar-peca tbody tr")[0].cells[1].textContent.trim(),
+                    id: document.querySelectorAll("#tela-gerenciar-peca tbody tr")[0].cells[2].textContent.trim(),
+                    cor: document.querySelectorAll("#tela-gerenciar-peca tbody tr")[0].cells[3].textContent.trim(),
+                    quantidade: 1 // Marcar uma como quebrada
+                };
+            } else if (id === 2) {
+                peca = {
+                    imagem: document.querySelectorAll("#tela-gerenciar-peca tbody tr")[1].cells[0].querySelector('img').src,
+                    nome: document.querySelectorAll("#tela-gerenciar-peca tbody tr")[1].cells[1].textContent.trim(),
+                    id: document.querySelectorAll("#tela-gerenciar-peca tbody tr")[1].cells[2].textContent.trim(),
+                    cor: document.querySelectorAll("#tela-gerenciar-peca tbody tr")[1].cells[3].textContent.trim(),
+                    quantidade: 1
+                };
+            } else { // id === 3
+                peca = {
+                    imagem: document.querySelectorAll("#tela-gerenciar-peca tbody tr")[2].cells[0].querySelector('img').src,
+                    nome: document.querySelectorAll("#tela-gerenciar-peca tbody tr")[2].cells[1].textContent.trim(),
+                    id: document.querySelectorAll("#tela-gerenciar-peca tbody tr")[2].cells[2].textContent.trim(),
+                    cor: document.querySelectorAll("#tela-gerenciar-peca tbody tr")[2].cells[3].textContent.trim(),
+                    quantidade: 1
+                };
+            }
+            
+            const existente = pecasQuebradas.find(p => p.id === peca.id && p.cor === peca.cor);
+            if(existente){
+                existente.quantidade +=1;
+            } else {
+            pecasQuebradas.push(peca);
+            }
+            
+            showToast(`Peça ${peca.nome} (${peca.cor}) marcada como quebrada.`);
+            
+            atualizarTabelaQuebradas();
+        }
+        
+        function atualizarTabelaQuebradas() {
+            const tabela = document.getElementById('tabela-quebradas');
+            const semQuebradas = document.getElementById('sem-quebradas');
+            
+            // Limpa a tabela
+            tabela.innerHTML = '';
+            
+            if (pecasQuebradas.length === 0) {
+                semQuebradas.classList.remove('hidden');
+                return;
+            }
+            
+            semQuebradas.classList.add('hidden');
+            
+            // Adiciona as peças quebradas à tabela
+            pecasQuebradas.forEach((peca, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <img src="${peca.imagem}" alt="${peca.nome}" class="h-10">
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm font-medium text-gray-900">${peca.nome}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-500">${peca.id}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-500">${peca.cor}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-500">${peca.quantidade}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <button onclick="registrarSubstituicao(${index})" class="text-blue-600 hover:text-blue-900">Substituir</button>
+                    </td>
+                `;
+                tabela.appendChild(tr);
+            });
+        }
+        
+        function registrarSubstituicao(index) {
+            const peca = pecasQuebradas[index];
+            
+            pecasQuebradas.splice(index, 1);
+            
+            showToast(`Peça ${peca.nome} substituída e removida da lista de quebradas.`);
+            
+            atualizarTabelaQuebradas();
+        }
+
+        function simularImportacao() {
+            const resultadoDiv = document.getElementById('resultado-importacao');
+            resultadoDiv.innerHTML = '<p class="text-center text-gray-500">Buscando informações do set...</p>';
+            resultadoDiv.classList.remove('hidden');
+
+            setTimeout(() => {
+                // Simula a resposta
+                resultadoDiv.innerHTML = `
+                    <h3 class="font-medium text-gray-900 mb-2">Set Encontrado:</h3>
+                    <div class="flex items-center mb-4">
+                        <img src="https://www.lego.com/cdn/cs/set/assets/blt3baed7e0eb07ab31/10283.jpg?fit=bounds&format=jpg&quality=80&width=320&height=320&dpr=1" alt="NASA Space Shuttle Discovery" class="h-16 mr-4">
+                        <div>
+                            <p class="font-medium">NASA Space Shuttle Discovery</p>
+                            <p class="text-sm text-gray-600">ID: 10283</p>
+                        </div>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-2">Peças: 2354</p>
+                    <p class="text-sm text-gray-600 mb-4">Ano: 2021</p>
+                    <button type="button" onclick="confirmarImportacao()" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-md transition duration-300">
+                        Importar Dados
+                    </button>
+                `;
+            }, 800);
+        }
+        
+        function confirmarImportacao() {
+            showToast('Dados importados com sucesso!');
+            mostrarTela('tela-cadastrar-set-completo');
+        }
+
+        function buscarSets() {
+            const resultadosDiv = document.getElementById('resultados-busca-set');
+            resultadosDiv.innerHTML = '<p class="text-center text-gray-500">Buscando sets...</p>';
+            resultadosDiv.classList.remove('hidden');
+            
+            setTimeout(() => {
+                 // Simula a resposta da busca
+                resultadosDiv.innerHTML = `
+                    <h3 class="text-lg font-semibold mb-3">Sets encontrados:</h3>
+                    <div class="space-y-3">
+                        <div class="border border-gray-200 rounded-md p-3 hover:bg-gray-50 cursor-pointer" onclick="preencherSetSelecionado('NASA Space Shuttle Discovery', '10283')">
+                            <div class="flex justify-between">
+                                <div>
+                                    <h4 class="font-medium">NASA Space Shuttle Discovery</h4>
+                                    <p class="text-sm text-gray-600">Código: 10283</p>
+                                    <p class="text-sm text-gray-600">Peças: 2354</p>
+                                </div>
+                                <img src="https://www.lego.com/cdn/cs/set/assets/blt3baed7e0eb07ab31/10283.jpg?fit=bounds&format=jpg&quality=80&width=320&height=320&dpr=1" alt="NASA Space Shuttle Discovery" class="h-16">
+                            </div>
+                        </div>
+                         <div class="border border-gray-200 rounded-md p-3 hover:bg-gray-50 cursor-pointer" onclick="preencherSetSelecionado('Millennium Falcon', '75192')">
+                            <div class="flex justify-between">
+                                <div>
+                                    <h4 class="font-medium">Millennium Falcon</h4>
+                                    <p class="text-sm text-gray-600">Código: 75192</p>
+                                    <p class="text-sm text-gray-600">Peças: 7541</p>
+                                </div>
+                                <img src="https://www.lego.com/cdn/cs/set/assets/blt0d234a31bb467a42/75192.jpg" alt="Millennium Falcon" class="h-16">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-6 space-y-4">
+                        <div>
+                            <label for="set-selecionado" class="block text-sm font-medium text-gray-700 mb-1">Set Selecionado</label>
+                            <input type="text" id="set-selecionado" class="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-100" value="" readonly>
+                        </div>
+                        <button type="button" onclick="confirmarSetCompleto()" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-md transition duration-300">
+                            Adicionar Set Completo
+                        </button>
+                    </div>
+                `;
+            }, 700);
+        }
+
+        function preencherSetSelecionado(nome, id) {
+            document.getElementById('set-selecionado').value = `${nome} (${id})`;
+        }
+        
+        function confirmarSetCompleto() {
+            const setSelecionado = document.getElementById('set-selecionado').value;
+            if (!setSelecionado) {
+                showToast('Por favor, selecione um set da busca.', 'error');
+                return;
+            }
+            showToast('Set completo adicionado com sucesso!');
+            mostrarTela('tela-funcionalidades');
+        }
+        
+        function buscarSetsIncompletos() {
+            const resultadosDiv = document.getElementById('resultados-busca-set-inc');
+            resultadosDiv.innerHTML = '<p class="text-center text-gray-500">Buscando set...</p>';
+            resultadosDiv.classList.remove('hidden');
+
+            setTimeout(() => {
+                // Simula a resposta
+                resultadosDiv.innerHTML = `
+                    <h3 class="text-lg font-semibold mb-3">Set encontrado:</h3>
+                    <div class="border border-gray-200 rounded-md p-3">
+                        <div class="flex justify-between">
+                            <div>
+                                <h4 class="font-medium">Millennium Falcon (Exemplo)</h4>
+                                <p class="text-sm text-gray-600">Código: 75192</p>
+                                <p class="text-sm text-gray-600">Peças: 7541</p>
+                            </div>
+                            <img src="https://www.lego.com/cdn/cs/set/assets/blt0d234a31bb467a42/75192.jpg" alt="Millennium Falcon" class="h-16">
+                        </div>
+                    </div>
+                    <div class="mt-6">
+                        <h3 class="text-lg font-semibold mb-3">Lista de Peças (Exemplo):</h3>
+                        <div class="mb-4 max-h-60 overflow-y-auto border border-gray-200 rounded-md p-3">
+                            <div class="space-y-2">
+                                <!-- Peças de exemplo -->
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <img src="https://www.bricklink.com/PL/3001.jpg" alt="Brick 2x4" class="h-8 mr-2">
+                                        <div>
+                                            <p class="text-sm font-medium">Brick 2x4 (Cinza)</p>
+                                            <p class="text-xs text-gray-600">45 unidades</p>
+                                        </div>
+                                    </div>
+                                    <button class="text-red-500 hover:text-red-700" onclick="this.parentElement.parentElement.remove()">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 00-3.7-3.7 48.678 48.678 0 00-7.324 0 4.006 4.006 0 00-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3l-3-3m-12 3c0 1.232.046 2.453.138 3.662a4.006 4.006 0 003.7 3.7 48.656 48.656 0 007.324 0 4.006 4.006 0 003.7-3.7c.017-.22.032-.441.046-.662M4.5 12l3 3m-3-3l-3 3" />
+                                        </svg>
+                                    </button>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <img src="https://www.bricklink.com/PL/3003.jpg" alt="Brick 2x2" class="h-8 mr-2">
+                                        <div>
+                                            <p class="text-sm font-medium">Brick 2x2 (Branco)</p>
+                                            <p class="text-xs text-gray-600">32 unidades</p>
+                                        </div>
+                                    </div>
+                                     <button class="text-red-500 hover:text-red-700" onclick="this.parentElement.parentElement.remove()">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 00-3.7-3.7 48.678 48.678 0 00-7.324 0 4.006 4.006 0 00-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3l-3-3m-12 3c0 1.232.046 2.453.138 3.662a4.006 4.006 0 003.7 3.7 48.656 48.656 0 007.324 0 4.006 4.006 0 003.7-3.7c.017-.22.032-.441.046-.662M4.5 12l3 3m-3-3l-3 3" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-sm text-yellow-600 mb-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 inline-block mr-1 align-text-bottom">
+                                <path fill-rule="evenodd" d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003zM12 8.25a.75.75 0 01.75.75v3.75a.75.75 0 01-1.5 0V9a.75.75 0 01.75-.75zm0 8.25a.75.75 0 100-1.5.75.75 0 000 1.5z" clip-rule="evenodd" />
+                            </svg>
+                            Desmarque as peças que estão faltando clicando no ícone à direita de cada peça.
+                        </p>
+                        <button type="button" onclick="confirmarSetIncompleto()" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-md transition duration-300">
+                            Adicionar Set Incompleto
+                        </button>
+                    </div>
+                `;
+            }, 700);
+        }
+        
+        function confirmarSetIncompleto() {
+            showToast('Set incompleto adicionado com sucesso!');
+            mostrarTela('tela-funcionalidades');
+        }
+        
+        function iniciarMontagem() {
+            // Verificar se o tipo de set foi selecionado
+            const tipoSelecionado = document.querySelector('input[name="tipo-set"]:checked');
+            if (!tipoSelecionado) {
+                showToast('Por favor, selecione o tipo de set', 'error');
+                return;
+            }
+
+            // Se for Mindstorms, verificar se o subtipo foi selecionado
+            if (tipoSelecionado.id === 'tipo-mindstorms') {
+                const subtipoSelecionado = document.querySelector('input[name="mindstorms-subtype"]:checked');
+                if (!subtipoSelecionado) {
+                    showToast('Por favor, selecione a versão do Mindstorms', 'error');
+                    return;
+                }
+            }
+
+            const nomeSet = setAtualEmContexto ? setAtualEmContexto.nome : "Set Desconhecido";
+            showToast(`Montagem do set "${nomeSet}" iniciada! Boa diversão!`, 'info');
+            
+            const tituloGerenciar = document.querySelector("#tela-gerenciar-set-montado h2.text-2xl");
+            if (tituloGerenciar) {
+                tituloGerenciar.textContent = `Set: ${nomeSet}`;
+            }
+            
+            // Preparar a tela de montagem antes de mostrar
+            prepararTelaMontagem();
+            
+            mostrarTela('tela-gerenciar-set-montado');
+        }
+        
+        // Variáveis para controle dos passos de montagem
+        let passoAtual = 1;
+        let totalPassos = 5;
+        let passosConcluidos = [];
+
+        // Dados simulados para os passos de montagem
+        const dadosPassos = [
+            {
+                numero: 1,
+                imagem: "https://www.lego.com/cdn/product-assets/product.bi.core.pdf/6217457.pdf.png",
+                pecas: [
+                    { id: "3001", nome: "Brick 2x4", imagem: "https://www.bricklink.com/PL/3001.jpg", quantidade: 2 },
+                    { id: "3003", nome: "Brick 2x2", imagem: "https://www.bricklink.com/PL/3003.jpg", quantidade: 4 },
+                    { id: "3023", nome: "Plate 1x2", imagem: "https://www.bricklink.com/PL/3023.jpg", quantidade: 6 }
+                ]
+            },
+            {
+                numero: 2,
+                imagem: "https://www.lego.com/cdn/product-assets/product.bi.core.pdf/6217458.pdf.png",
+                pecas: [
+                    { id: "3005", nome: "Brick 1x1", imagem: "https://www.bricklink.com/PL/3005.jpg", quantidade: 8 },
+                    { id: "3004", nome: "Brick 1x2", imagem: "https://www.bricklink.com/PL/3004.jpg", quantidade: 4 }
+                ]
+            },
+            {
+                numero: 3,
+                imagem: "https://www.lego.com/cdn/product-assets/product.bi.core.pdf/6217459.pdf.png",
+                pecas: [
+                    { id: "3010", nome: "Brick 1x4", imagem: "https://www.bricklink.com/PL/3010.jpg", quantidade: 6 },
+                    { id: "3022", nome: "Plate 2x2", imagem: "https://www.bricklink.com/PL/3022.jpg", quantidade: 2 }
+                ]
+            },
+            {
+                numero: 4,
+                imagem: "https://www.lego.com/cdn/product-assets/product.bi.core.pdf/6217460.pdf.png",
+                pecas: [
+                    { id: "3039", nome: "Slope 45 2x2", imagem: "https://www.bricklink.com/PL/3039.jpg", quantidade: 4 },
+                    { id: "3040", nome: "Slope 45 2x1", imagem: "https://www.bricklink.com/PL/3040.jpg", quantidade: 2 }
+                ]
+            },
+            {
+                numero: 5,
+                imagem: "https://www.lego.com/cdn/product-assets/product.bi.core.pdf/6217461.pdf.png",
+                pecas: [
+                    { id: "3666", nome: "Plate 1x6", imagem: "https://www.bricklink.com/PL/3666.jpg", quantidade: 2 },
+                    { id: "3710", nome: "Plate 1x4", imagem: "https://www.bricklink.com/PL/3710.jpg", quantidade: 4 }
+                ]
+            }
+        ];
+
+        function mostrarPasso(numeroPasso) {
+            // Verificar se o número do passo é válido
+            if (numeroPasso < 1 || numeroPasso > totalPassos) {
+                return;
+            }
+            
+            // Atualizar o passo atual
+            passoAtual = numeroPasso;
+            
+            // Atualizar a interface
+            atualizarInterfacePasso();
+            
+            // Atualizar a seleção visual dos passos
+            document.querySelectorAll('[onclick^="mostrarPasso"]').forEach((elemento, index) => {
+                if (index + 1 === passoAtual) {
+                    elemento.classList.remove('bg-gray-200', 'hover:bg-gray-300');
+                    elemento.classList.add('bg-blue-500', 'text-white');
+                } else {
+                    elemento.classList.remove('bg-blue-500', 'text-white');
+                    elemento.classList.add('bg-gray-200', 'hover:bg-gray-300');
+                }
+            });
+        }
+        
+        function passoAnterior() {
+            if (passoAtual > 1) {
+                mostrarPasso(passoAtual - 1);
+            } else {
+                showToast('Você já está no primeiro passo', 'info');
+            }
+        }
+        
+        function proximoPasso() {
+            if (passoAtual < totalPassos) {
+                mostrarPasso(passoAtual + 1);
+            } else {
+                showToast('Você já está no último passo', 'info');
+            }
+        }
+        
+        function atualizarInterfacePasso() {
+            // Obter dados do passo atual
+            const dadosPasso = dadosPassos[passoAtual - 1];
+            
+            // Atualizar título do passo
+            document.getElementById('titulo-passo-atual').textContent = `Passo ${passoAtual} de ${totalPassos}`;
+            
+            // Atualizar imagem do passo
+            document.getElementById('imagem-passo-atual').src = dadosPasso.imagem;
+            document.getElementById('imagem-passo-atual').alt = `Passo ${passoAtual}`;
+            
+            // Atualizar peças necessárias
+            const containerPecas = document.getElementById('pecas-passo-atual');
+            containerPecas.innerHTML = '';
+            
+            dadosPasso.pecas.forEach(peca => {
+                const divPeca = document.createElement('div');
+                divPeca.className = 'bg-white rounded p-1';
+                divPeca.innerHTML = `
+                    <img src="${peca.imagem}" alt="${peca.nome}" class="h-8">
+                    <p class="text-xs text-center">x${peca.quantidade}</p>
+                `;
+                containerPecas.appendChild(divPeca);
+            });
+            
+            // Atualizar estado do botão "Concluído"
+            const botaoConcluido = document.querySelector('[onclick="marcarPassoConcluido()"]');
+            if (passosConcluidos.includes(passoAtual)) {
+                botaoConcluido.classList.remove('bg-green-500', 'hover:bg-green-600');
+                botaoConcluido.classList.add('bg-gray-400', 'hover:bg-gray-500');
+                botaoConcluido.textContent = 'Concluído ✓';
+            } else {
+                botaoConcluido.classList.remove('bg-gray-400', 'hover:bg-gray-500');
+                botaoConcluido.classList.add('bg-green-500', 'hover:bg-green-600');
+                botaoConcluido.textContent = 'Concluído';
+            }
+        }
+        
+        function marcarPassoConcluido() {
+            if (!passosConcluidos.includes(passoAtual)) {
+                passosConcluidos.push(passoAtual);
+                showToast(`Passo ${passoAtual} concluído!`, 'success');
+                
+                // Atualizar interface
+                atualizarInterfacePasso();
+                
+                // Se todos os passos foram concluídos, mostrar mensagem
+                if (passosConcluidos.length === totalPassos) {
+                    setTimeout(() => {
+                        showToast('Parabéns! Você concluiu a montagem do set!', 'success');
+                    }, 1000);
+                } else if (passoAtual < totalPassos) {
+                    // Avançar para o próximo passo automaticamente após um breve delay
+                    setTimeout(() => {
+                        proximoPasso();
+                    }, 800);
+                }
+            } else {
+                // Remover da lista de concluídos se clicar novamente
+                passosConcluidos = passosConcluidos.filter(p => p !== passoAtual);
+                showToast(`Passo ${passoAtual} marcado como não concluído`, 'info');
+                atualizarInterfacePasso();
+            }
+        }
+
+        function prepararTelaMontagem() {
+            // Resetar variáveis de controle
+            passoAtual = 1;
+            passosConcluidos = [];
+            
+            // Atualizar nome do set na tela de montagem
+            if (setAtualEmContexto) {
+                document.getElementById('nome-set-montagem').textContent = setAtualEmContexto.nome;
+            }
+            
+            // Inicializar a interface com o primeiro passo
+            atualizarInterfacePasso();
+            
+            // Resetar a seleção visual dos passos
+            document.querySelectorAll('[onclick^="mostrarPasso"]').forEach((elemento, index) => {
+                if (index === 0) {
+                    elemento.classList.remove('bg-gray-200', 'hover:bg-gray-300');
+                    elemento.classList.add('bg-blue-500', 'text-white');
+                } else {
+                    elemento.classList.remove('bg-blue-500', 'text-white');
+                    elemento.classList.add('bg-gray-200', 'hover:bg-gray-300');
+                }
+            });
+        }
+
+        function acaoSetMontado(acao) {
+            let mensagem = "Ação realizada com sucesso!";
+            let tipo = "success";
+            
+            switch (acao) {
+                case 'desmontar':
+                    mensagem = "Set desmontado e peças retornadas ao inventário (simulado).";
+                    break;
+                case 'guardar':
+                    mensagem = "Set guardado na sua coleção de sets montados (simulado).";
+                    break;
+                case 'modificacoes':
+                    mensagem = "Modificações registradas com sucesso (simulado).";
+                    break;
+                case 'compartilhar':
+                    mensagem = "Link para compartilhamento gerado e copiado para a área de transferência (simulado).";
+                    tipo = "info";
+                    break;
+                default:
+                    mensagem = "Ação não reconhecida.";
+                    tipo = "error";
+            }
+            
+            showToast(mensagem, tipo);
+            
+            // Se for desmontar, voltar para a tela de funcionalidades
+            if (acao === 'desmontar') {
+                setTimeout(() => {
+                    mostrarTela('tela-funcionalidades');
+                }, 1500);
+            }
+        }
+
+        // Simulação de um catálogo de sets externos
+        const catalogoSetsExternos = [
+            { 
+                id: "75313", 
+                nome: "AT-AT™", 
+                pecasTotal: 6785, 
+                imagem: "https://www.lego.com/cdn/cs/set/assets/blt0bf1fb2d4a464f3d/75313.png",
+                listaPecas: [ // Lista de peças simplificada para simulação
+                    { nome: "Brick 2x4", cor: "Cinza Claro", quantidadeNecessaria: 50, idPeca: "3001", imagemPeca: "https://www.bricklink.com/PL/3001.jpg" },
+                    { nome: "Plate 1x2", cor: "Cinza Escuro", quantidadeNecessaria: 30, idPeca: "3023", imagemPeca: "https://www.bricklink.com/PL/3023.jpg" },
+                    { nome: "Technic Pin", cor: "Preto", quantidadeNecessaria: 100, idPeca: "2780", imagemPeca: "https://www.bricklink.com/PL/2780.jpg" },
+                    { nome: "Tile 2x2", cor: "Branco", quantidadeNecessaria: 10, idPeca: "3068b", imagemPeca: "https://www.bricklink.com/PL/3068b.jpg" }
+                ]
+            },
+            { 
+                id: "10294", 
+                nome: "Titanic", 
+                pecasTotal: 9090, 
+                imagem: "https://www.lego.com/cdn/cs/set/assets/blt982f1410ba39cb6e/10294.png",
+                listaPecas: [
+                    { nome: "Brick 1x2", cor: "Marrom Avermelhado", quantidadeNecessaria: 200, idPeca: "3004", imagemPeca: "https://www.bricklink.com/PL/3004.jpg" },
+                    { nome: "Plate 2x8", cor: "Preto", quantidadeNecessaria: 50, idPeca: "3034", imagemPeca: "https://www.bricklink.com/PL/3034.jpg" },
+                    { nome: "Slope 45 2x2", cor: "Amarelo", quantidadeNecessaria: 30, idPeca: "3039", imagemPeca: "https://www.bricklink.com/PL/3039.jpg" }
+                ]
+            },
+            { 
+                id: "21325", 
+                nome: "Ferreiro Medieval", 
+                pecasTotal: 2164, 
+                imagem: "https://www.lego.com/cdn/cs/set/assets/bltd6e481b45a02f17e/21325.png",
+                listaPecas: [
+                    { nome: "Brick 1x1", cor: "Marrom Escuro", quantidadeNecessaria: 50, idPeca: "3005", imagemPeca: "https://www.bricklink.com/PL/3005.jpg" },
+                    { nome: "Roof Tile 1x2x3/73", cor: "Azul Arenoso", quantidadeNecessaria: 40, idPeca: "32803", imagemPeca: "https://www.bricklink.com/PL/32803.jpg" }
+                ]
+            }
+        ];
+
+        function buscarSetExterno() {
+            const termoBusca = document.getElementById('busca-set-externo').value.toLowerCase();
+            const listaResultados = document.getElementById('lista-resultados-set-externo');
+            const containerResultados = document.getElementById('resultados-busca-set-externo');
+            
+            // Verificar se o termo de busca está vazio
+            if (!termoBusca.trim()) {
+                showToast('Por favor, digite um termo para buscar', 'error');
+                return;
+            }
+            
+            listaResultados.innerHTML = '<p class="text-center text-gray-500 col-span-full">Buscando sets...</p>'; // Indicador de carregamento
+            containerResultados.classList.remove('hidden');
+
+            // Simular delay da busca
+            setTimeout(() => {
+                // Se o termo de busca for 8000, mostrar um set aleatório
+                if (termoBusca === '8000') {
+                    // Escolher um set aleatório do catálogo
+                    const indiceAleatorio = Math.floor(Math.random() * catalogoSetsExternos.length);
+                    const setAleatorio = catalogoSetsExternos[indiceAleatorio];
+                    
+                    // Criar um novo set baseado no aleatório, mas com ID 8000
+                    const setSimulado = {
+                        id: "8000",
+                        nome: "LEGO Mindstorms Robô Explorador",
+                        pecasTotal: 847,
+                        imagem: setAleatorio.imagem, // Reutiliza a imagem do set aleatório
+                        listaPecas: setAleatorio.listaPecas // Reutiliza as peças do set aleatório
+                    };
+                    
+                    listaResultados.innerHTML = ''; // Limpa o "Buscando..."
+                    
+                    const divSet = document.createElement('div');
+                    divSet.className = "border border-gray-200 rounded-md p-3 hover:bg-gray-50 cursor-pointer";
+                    divSet.onclick = () => selecionarSetExterno(setSimulado);
+                    
+                    divSet.innerHTML = `
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center">
+                                <img src="${setSimulado.imagem}" alt="${setSimulado.nome}" class="h-16 mr-4 object-contain">
+                                <div>
+                                    <h4 class="font-medium">${setSimulado.nome}</h4>
+                                    <p class="text-sm text-gray-600">ID: ${setSimulado.id}</p>
+                                    <p class="text-sm text-gray-600">Peças: ${setSimulado.pecasTotal}</p>
+                                </div>
+                            </div>
+                            <button class="bg-purple-500 hover:bg-purple-600 text-white text-sm px-3 py-1 rounded">Verificar Peças</button>
+                        </div>
+                    `;
+                    listaResultados.appendChild(divSet);
+                    
+                    showToast('Set encontrado!', 'success');
+                } else {
+                    const resultados = catalogoSetsExternos.filter(set => 
+                        set.nome.toLowerCase().includes(termoBusca) || 
+                        set.id.toLowerCase().includes(termoBusca)
+                    );
+
+                    listaResultados.innerHTML = ''; // Limpa o "Buscando..." ou resultados anteriores
+
+                    if (resultados.length > 0) {
+                        resultados.forEach(set => {
+                            const divSet = document.createElement('div');
+                            divSet.className = "border border-gray-200 rounded-md p-3 hover:bg-gray-50 cursor-pointer";
+                            divSet.onclick = () => selecionarSetExterno(set);
+                            
+                            divSet.innerHTML = `
+                                <div class="flex justify-between items-center">
+                                    <div class="flex items-center">
+                                        <img src="${set.imagem}" alt="${set.nome}" class="h-16 mr-4 object-contain">
+                                        <div>
+                                            <h4 class="font-medium">${set.nome}</h4>
+                                            <p class="text-sm text-gray-600">ID: ${set.id}</p>
+                                            <p class="text-sm text-gray-600">Peças: ${set.pecasTotal}</p>
+                                        </div>
+                                    </div>
+                                    <button class="bg-purple-500 hover:bg-purple-600 text-white text-sm px-3 py-1 rounded">Verificar Peças</button>
+                                </div>
+                            `;
+                            listaResultados.appendChild(divSet);
+                        });
+                    } else {
+                        listaResultados.innerHTML = '<p class="text-gray-500 text-center">Nenhum set encontrado com esse termo.</p>';
+                    }
+                }
+            }, 700); // Simula delay da busca
+        }
+
+        function selecionarSetExterno(set) {
+            setAtualEmContexto = { ...set, origem: 'externo' }; // Adiciona uma flag para diferenciar
+            // Antes de mostrar a tela de verificar peças, precisamos popular os dados
+            prepararTelaVerificarPecas(setAtualEmContexto);
+            mostrarTela('tela-verificar-pecas');
+        }
+
+        // Simulação do inventário de peças do usuário
+        const inventarioUsuario = [
+            { idPeca: "3001", nome: "Brick 2x4", cor: "Vermelho", quantidade: 20, imagemPeca: "https://www.bricklink.com/PL/3001.jpg" },
+            { idPeca: "3001", nome: "Brick 2x4", cor: "Azul", quantidade: 15, imagemPeca: "https://www.bricklink.com/PL/3001.jpg" },
+            { idPeca: "3023", nome: "Plate 1x2", cor: "Preto", quantidade: 50, imagemPeca: "https://www.bricklink.com/PL/3023.jpg" },
+            { idPeca: "3005", nome: "Brick 1x1", cor: "Branco", quantidade: 100, imagemPeca: "https://www.bricklink.com/PL/3005.jpg" },
+            { idPeca: "2780", nome: "Technic Pin", cor: "Preto", quantidade: 5, imagemPeca: "https://www.bricklink.com/PL/2780.jpg" },
+            // Adicione mais peças conforme necessário para testar
+        ];
+
+        // Simulação de "Meus Sets" para a funcionalidade de encontrar peças em outros sets
+        const meusSetsCadastrados = [
+            {
+                id: "10297", nome: "Creator Expert - Boutique Hotel", listaPecas: [
+                    { idPeca: "3001", cor: "Cinza Claro", quantidade: 12 }, // Brick 2x4
+                    { idPeca: "3068b", cor: "Branco", quantidade: 20 } // Tile 2x2
+                ]
+            },
+            {
+                id: "42083", nome: "Technic - Bugatti Chiron", listaPecas: [
+                    { idPeca: "3023", cor: "Preto", quantidade: 8 }, // Plate 1x2
+                ]
+            }
+        ];
+
+        function prepararTelaVerificarPecas(setInfo) {
+            if (!setInfo || !setInfo.listaPecas) {
+                console.error("Informações do set ou lista de peças ausentes.", setInfo);
+                showToast('Erro ao carregar informações do set', 'error');
+                // Idealmente, mostrar um erro para o usuário ou voltar
+                mostrarTela('tela-funcionalidades'); 
+                return;
+            }
+
+            // Atualiza o nome do set na tela
+            document.getElementById('nome-set-verificar').textContent = setInfo.nome;
+            
+            const listaNecessariasDiv = document.getElementById('lista-pecas-necessarias');
+            const listaDisponiveisOutrosSetsDiv = document.getElementById('lista-pecas-disponiveis-outros-sets');
+            
+            // Limpa as listas antes de popular
+            listaNecessariasDiv.innerHTML = '';
+            listaDisponiveisOutrosSetsDiv.innerHTML = '';
+
+            // Array para armazenar peças que realmente faltam
+            let pecasRealmenteFaltantesGlobal = [];
+            
+            // Verifica se o usuário quer considerar cores na verificação
+            const verificarComCores = document.getElementById('verificar-com-cores').checked;
+
+            // Processa cada peça necessária do set
+            setInfo.listaPecas.forEach(pecaNecessaria => {
+                let quantidadeNoInventario = 0;
+                
+                // Verifica no inventário do usuário
+                inventarioUsuario.forEach(pecaUsuario => {
+                    if (pecaUsuario.idPeca === pecaNecessaria.idPeca) {
+                        // Se verificar com cores, só conta se a cor for a mesma
+                        if (!verificarComCores || (verificarComCores && pecaUsuario.cor === pecaNecessaria.cor)) {
+                            quantidadeNoInventario += pecaUsuario.quantidade;
+                        }
+                    }
+                });
+
+                // Calcula quantas peças faltam
+                const faltam = pecaNecessaria.quantidadeNecessaria - quantidadeNoInventario;
+                const temSuficiente = faltam <= 0;
+                
+                // Cria o elemento visual para a peça
+                const divPeca = document.createElement('div');
+                divPeca.className = `flex items-center p-2 rounded mb-2 ${temSuficiente ? 'bg-green-100' : 'bg-red-100'}`;
+                divPeca.innerHTML = `
+                    <img src="${pecaNecessaria.imagemPeca || 'https://via.placeholder.com/40x40.png?text=?'}" alt="${pecaNecessaria.nome}" class="h-8 mr-2">
+                    <div class="flex-grow">
+                        <p class="text-sm font-medium">${pecaNecessaria.nome} (${pecaNecessaria.cor})</p>
+                        <p class="text-xs text-gray-600">
+                            Necessárias: ${pecaNecessaria.quantidadeNecessaria} | Possui: ${quantidadeNoInventario} 
+                            ${temSuficiente 
+                                ? '<span class="text-green-600 font-medium">✔️</span>' 
+                                : `<span class="text-red-600 font-medium">(Faltam: ${faltam}) ⚠️</span>`}
+                        </p>
+                    </div>
+                `;
+                listaNecessariasDiv.appendChild(divPeca);
+
+                // Se faltam peças, adiciona à lista global de peças faltantes
+                if (faltam > 0) {
+                    pecasRealmenteFaltantesGlobal.push({...pecaNecessaria, quantidadeFaltante: faltam});
+                }
+            });
+            
+            // Se não faltam peças, exibe mensagem positiva
+            if (pecasRealmenteFaltantesGlobal.length === 0) {
+                listaNecessariasDiv.innerHTML += '<p class="text-center text-green-700 font-semibold mt-2 p-2 bg-green-50 rounded">Você possui todas as peças necessárias para este set! 🎉</p>';
+            } else {
+                // Exibe o número total de peças faltantes
+                const totalPecasFaltantes = pecasRealmenteFaltantesGlobal.reduce((total, peca) => total + peca.quantidadeFaltante, 0);
+                listaNecessariasDiv.innerHTML += `<p class="text-center text-red-700 font-semibold mt-2 p-2 bg-red-50 rounded">Faltam ${totalPecasFaltantes} peças no total para montar este set</p>`;
+            }
+
+            // Simulação de busca em outros sets
+            if (pecasRealmenteFaltantesGlobal.length > 0) {
+                let sugestoesEncontradas = false;
+                
+                // Cria um título para a seção
+                listaDisponiveisOutrosSetsDiv.innerHTML = '<h4 class="font-medium text-blue-800 mb-2">Peças encontradas em outros sets:</h4>';
+                
+                // Para cada peça faltante, procura em outros sets
+                pecasRealmenteFaltantesGlobal.forEach(pecaFaltante => {
+                    let pecaEncontradaEmAlgumSet = false;
+                    
+                    meusSetsCadastrados.forEach(meuSet => {
+                        // Não sugerir peças do próprio set se for um set "meu"
+                        if (meuSet.id === setInfo.id && setInfo.origem === 'interno') return;
+
+                        meuSet.listaPecas.forEach(pecaNoMeuSet => {
+                            if (pecaNoMeuSet.idPeca === pecaFaltante.idPeca && 
+                                (!verificarComCores || (verificarComCores && pecaNoMeuSet.cor === pecaFaltante.cor)) &&
+                                pecaNoMeuSet.quantidade > 0) {
+                                    
+                                // Cria um elemento para a peça encontrada
+                                const divPecaEncontrada = document.createElement('div');
+                                divPecaEncontrada.className = "mb-2 p-2 bg-blue-50 rounded";
+                                divPecaEncontrada.innerHTML = `
+                                    <div class="flex items-center">
+                                        <img src="${pecaFaltante.imagemPeca || 'https://via.placeholder.com/30x30.png?text=?'}" alt="${pecaFaltante.nome}" class="h-6 mr-2">
+                                        <div>
+                                            <p class="text-sm font-medium">${pecaFaltante.nome} (${pecaFaltante.cor})</p>
+                                            <p class="text-xs">Encontrada em: <span class="font-medium">${meuSet.nome}</span> - ${pecaNoMeuSet.quantidade} unidade(s)</p>
+                                        </div>
+                                    </div>
+                                `;
+                                listaDisponiveisOutrosSetsDiv.appendChild(divPecaEncontrada);
+                                
+                                sugestoesEncontradas = true;
+                                pecaEncontradaEmAlgumSet = true;
+                            }
+                        });
+                    });
+                    
+                    // Se a peça não foi encontrada em nenhum set, mostrar isso
+                    if (!pecaEncontradaEmAlgumSet) {
+                        const divPecaNaoEncontrada = document.createElement('div');
+                        divPecaNaoEncontrada.className = "mb-2 p-2 bg-yellow-50 rounded";
+                        divPecaNaoEncontrada.innerHTML = `
+                            <div class="flex items-center">
+                                <img src="${pecaFaltante.imagemPeca || 'https://via.placeholder.com/30x30.png?text=?'}" alt="${pecaFaltante.nome}" class="h-6 mr-2">
+                                <div>
+                                    <p class="text-sm font-medium">${pecaFaltante.nome} (${pecaFaltante.cor})</p>
+                                    <p class="text-xs text-yellow-700">Não encontrada em nenhum outro set</p>
+                                </div>
+                            </div>
+                        `;
+                        listaDisponiveisOutrosSetsDiv.appendChild(divPecaNaoEncontrada);
+                    }
+                });
+                
+                if (!sugestoesEncontradas) {
+                    listaDisponiveisOutrosSetsDiv.innerHTML = '<p class="text-blue-800">Nenhuma peça faltante foi encontrada em seus outros sets cadastrados.</p>';
+                }
+            } else {
+                listaDisponiveisOutrosSetsDiv.innerHTML = '<p class="text-blue-800">Não há peças faltando para verificar em outros sets.</p>';
+            }
+            
+            // Adicionar event listeners para os radios de verificação de cor para atualizar a tela
+            document.getElementById('verificar-com-cores').onchange = () => prepararTelaVerificarPecas(setAtualEmContexto);
+            document.getElementById('verificar-sem-cores').onchange = () => prepararTelaVerificarPecas(setAtualEmContexto);
+        }
+
+        function voltarDaTelaVerificarPecas() {
+            if (setAtualEmContexto && setAtualEmContexto.origem === 'externo') {
+                mostrarTela('tela-explorar-sets');
+            } else {
+                mostrarTela('tela-montar-set');
+            }
+            setAtualEmContexto = null; // Limpa o contexto ao voltar
+        }
+
+        // Função para sair da conta e voltar para a tela inicial
+        function sairDaConta() {
+            // Confirmar com o usuário antes de sair
+            if (confirm('Tem certeza que deseja sair da sua conta?')) {
+                // Simula logout (em um sistema real, limparia tokens de autenticação, etc.)
+                showToast('Você saiu da sua conta com sucesso!', 'info');
+                mostrarTela('tela-inicial');
+            }
+        }
+    </script>
+</body>
+</html> 
